@@ -421,6 +421,34 @@ body {
 .combo-es { font-size: 12px; color: var(--text); margin-top: 2px; }
 .combo-ex { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
 
+/* ── TTS ──────────────────────────────── */
+.speak-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(232,201,122,.1);
+  border: 1px solid rgba(232,201,122,.25);
+  color: var(--accent); font-size: 13px;
+  cursor: pointer; flex-shrink: 0;
+  transition: all .15s; vertical-align: middle;
+  margin-left: 4px;
+}
+.speak-btn:active, .speak-btn.speaking {
+  background: rgba(232,201,122,.25);
+  transform: scale(1.15);
+}
+.speak-btn.speaking { color: var(--accent2); border-color: var(--accent2); }
+
+.tts-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: rgba(91,196,160,.07);
+  border: 1px solid rgba(91,196,160,.2);
+  border-radius: 10px; margin-bottom: 14px;
+  font-size: 12px; color: var(--accent2);
+}
+
+.phrase-en .speak-btn { margin-left: 6px; }
+
 /* responsive */
 @media (max-width: 360px) {
   .vocab-grid { grid-template-columns: 1fr; }
@@ -2388,12 +2416,15 @@ function openLesson(num) {
 
   // Content
   const content = document.getElementById('lesson-content');
-  content.innerHTML = l.tabs.map((t,i) =>
+  content.innerHTML = ttsBanner() + l.tabs.map((t,i) =>
     `<div class="panel ${i===0?'active':''}" id="panel-${t.id}">${l.panels[t.id]||''}</div>`
   ).join('');
 
   // Init quizzes
   content.querySelectorAll('.quiz-wrap').forEach(el => renderQuiz(el));
+
+  // Inject TTS buttons
+  injectTTS(content);
 
   // Mark done
   if (!completed.includes(num)) {
@@ -2407,7 +2438,11 @@ function switchTab(id, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('panel-'+id)?.classList.add('active');
+  const panel = document.getElementById('panel-'+id);
+  if (panel) {
+    panel.classList.add('active');
+    injectTTS(panel);
+  }
 }
 
 function goHome() {
@@ -2498,6 +2533,100 @@ function restartQuiz(btn) {
   wrap.dataset.idx = '0';
   wrap.dataset.score = '0';
   renderQuiz(wrap);
+}
+
+// ════════════════════════════════════════════════════════
+// TEXT TO SPEECH ENGINE
+// ════════════════════════════════════════════════════════
+
+const TTS = {
+  synth: window.speechSynthesis,
+  voice: null,
+  rate: 0.85,
+
+  init() {
+    const load = () => {
+      const voices = this.synth.getVoices();
+      this.voice =
+        voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) ||
+        voices.find(v => v.lang === 'en-US') ||
+        voices.find(v => v.lang === 'en-GB') ||
+        voices.find(v => v.lang.startsWith('en')) ||
+        null;
+    };
+    load();
+    if (this.synth.onvoiceschanged !== undefined) this.synth.onvoiceschanged = load;
+  },
+
+  speak(text, btn) {
+    if (!text) return;
+    this.synth.cancel();
+    const clean = text.replace(/\(.*?\)/g,'').replace(/→.*/,'').trim();
+    const utt = new SpeechSynthesisUtterance(clean);
+    utt.lang = 'en-US';
+    utt.rate = this.rate;
+    if (this.voice) utt.voice = this.voice;
+    if (btn) {
+      btn.classList.add('speaking');
+      utt.onend = () => btn.classList.remove('speaking');
+      utt.onerror = () => btn.classList.remove('speaking');
+    }
+    this.synth.speak(utt);
+  }
+};
+
+TTS.init();
+
+function speak(text, btn) { TTS.speak(text, btn); }
+
+function speakBtn(text) {
+  const t = (text||'').replace(/\\/g,'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return `<button class="speak-btn" onclick="speak('${t}',this)" title="Escuchar pronunciacion">🔊</button>`;
+}
+
+function injectTTS(container) {
+  container.querySelectorAll('.vocab-item').forEach(item => {
+    const en = item.querySelector('.vocab-en');
+    if (en && !en.querySelector('.speak-btn')) {
+      const txt = en.textContent.split('→')[0].trim();
+      en.insertAdjacentHTML('beforeend', speakBtn(txt));
+    }
+  });
+  container.querySelectorAll('.phrase-row').forEach(row => {
+    const en = row.querySelector('.phrase-en');
+    if (en && !en.querySelector('.speak-btn')) {
+      en.insertAdjacentHTML('beforeend', speakBtn(en.textContent.trim()));
+    }
+  });
+  container.querySelectorAll('.conj-table td.en').forEach(td => {
+    if (!td.querySelector('.speak-btn') && td.textContent.trim()) {
+      td.insertAdjacentHTML('beforeend', speakBtn(td.textContent.trim()));
+    }
+  });
+  container.querySelectorAll('.combo-verb').forEach(el => {
+    if (!el.querySelector('.speak-btn')) {
+      el.insertAdjacentHTML('beforeend', speakBtn(el.textContent.trim()));
+    }
+  });
+  container.querySelectorAll('.comp-word').forEach(el => {
+    if (!el.querySelector('.speak-btn')) {
+      el.insertAdjacentHTML('beforeend', speakBtn(el.textContent.trim()));
+    }
+  });
+}
+
+function ttsBanner() {
+  return `<div class="tts-bar">
+    🔊 Toca <b>🔊</b> en cualquier palabra o frase para escuchar la pronunciación en inglés.
+    <button style="flex-shrink:0;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;cursor:pointer" onclick="document.getElementById('tts-cfg').style.display=document.getElementById('tts-cfg').style.display==='none'?'flex':'none'">⚙️</button>
+  </div>
+  <div id="tts-cfg" style="display:none;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;align-items:center">
+    <span style="font-size:12px;color:var(--muted)">Velocidad:</span>
+    ${[['🐢 Lenta',0.6],['🎯 Normal',0.85],['⚡ Rápida',1.1]].map(([l,v])=>
+      `<button onclick="TTS.rate=${v};document.querySelectorAll('#tts-cfg button').forEach(b=>b.style.borderColor='var(--border)');this.style.borderColor='var(--accent2)'" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;cursor:pointer">${l}</button>`
+    ).join('')}
+    <button class="speak-btn" style="width:auto;padding:4px 10px;border-radius:8px;font-size:11px" onclick="speak('Hello, how are you today?',this)">🔊 Prueba</button>
+  </div>`;
 }
 
 // ════════════════════════════════════════════════════════
