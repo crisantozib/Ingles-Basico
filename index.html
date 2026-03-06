@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f1923">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Inglés Básico — Ghio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1923;
+  --surface: #172030;
+  --card: #1e2d3e;
+  --border: #2a3d52;
+  --accent: #e8c97a;
+  --accent2: #5bc4a0;
+  --accent3: #e07a5f;
+  --text: #d6e4f0;
+  --muted: #7a99b5;
+  --correct: #5bc4a0;
+  --wrong: #e07a5f;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  overscroll-behavior: none;
+}
+
+/* ── HOME ────────────────────────────── */
+#home {
+  display: flex; flex-direction: column; min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+.home-header {
+  padding: 40px 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.home-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; color: var(--accent);
+  line-height: 1.1;
+}
+
+.home-header p { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+.progress-bar {
+  height: 4px; background: var(--border);
+  border-radius: 2px; margin: 16px 0 0;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 2px; transition: width .5s ease;
+}
+
+.lessons-grid {
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.lesson-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer;
+  transition: all .2s ease;
+  position: relative; overflow: hidden;
+}
+
+.lesson-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(232,201,122,.04));
+  pointer-events: none;
+}
+
+.lesson-card:active { transform: scale(.98); }
+
+.lesson-num {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--card);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--accent); flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.lesson-num.done {
+  background: linear-gradient(135deg, #1a3a2a, #1e4d38);
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+.lesson-info { flex: 1; min-width: 0; }
+.lesson-info h3 { font-size: 14px; font-weight: 500; color: var(--text); }
+.lesson-info p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.lesson-tags {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;
+}
+
+.tag {
+  font-size: 10px; padding: 2px 7px;
+  border-radius: 20px; border: 1px solid;
+  font-weight: 500;
+}
+
+.tag-blue { color: #60a5fa; border-color: #1d3a6b; }
+.tag-gold { color: var(--accent); border-color: #4a3a10; }
+.tag-green { color: var(--accent2); border-color: #1a4a38; }
+.tag-red { color: var(--accent3); border-color: #4a1a10; }
+
+.lesson-arrow { color: var(--muted); font-size: 18px; }
+
+/* ── LESSON VIEW ─────────────────────── */
+#lesson-view { display: none; flex-direction: column; min-height: 100vh; }
+
+.lesson-topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+
+.btn-back {
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px;
+  padding: 7px 12px; font-size: 13px; cursor: pointer;
+  flex-shrink: 0;
+}
+
+.lesson-topbar h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; color: var(--accent); flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Tabs */
+.tabs-wrap {
+  overflow-x: auto; scrollbar-width: none;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs-wrap::-webkit-scrollbar { display: none; }
+
+.tabs {
+  display: flex; padding: 0 12px; gap: 0;
+  white-space: nowrap;
+}
+
+.tab {
+  padding: 12px 14px;
+  font-size: 12px; font-weight: 500;
+  color: var(--muted); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Content area */
+.lesson-content { padding: 16px; flex: 1; padding-bottom: 80px; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Cards inside panels */
+.vocab-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.vocab-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.vocab-en {
+  font-weight: 500; color: var(--accent);
+  font-size: 13px;
+}
+
+.vocab-pron {
+  font-size: 11px; color: var(--muted); margin-top: 1px;
+  font-style: italic;
+}
+
+.vocab-es {
+  font-size: 12px; color: var(--text); margin-top: 4px;
+}
+
+/* Tables */
+.conj-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px; margin: 10px 0;
+}
+
+.conj-table th {
+  background: var(--card);
+  color: var(--muted); font-weight: 500;
+  padding: 7px 10px; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.conj-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(42,61,82,.5);
+}
+
+.conj-table tr:last-child td { border-bottom: none; }
+
+.conj-table .en { color: var(--accent); font-weight: 500; }
+.conj-table .es { color: var(--text); }
+
+/* Section header */
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; color: var(--accent);
+  margin: 20px 0 10px;
+}
+
+.section-title:first-child { margin-top: 0; }
+
+.info-box {
+  background: var(--card);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  padding: 12px 14px;
+  margin: 10px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.info-box b { color: var(--accent); }
+
+.phrase-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px; padding: 8px 0;
+  border-bottom: 1px solid rgba(42,61,82,.4);
+  font-size: 13px;
+}
+
+.phrase-row:last-child { border-bottom: none; }
+.phrase-en { color: var(--accent2); font-weight: 500; flex: 1; }
+.phrase-es { color: var(--muted); text-align: right; flex: 1; }
+
+.opposite-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+
+.opp-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px;
+  text-align: center;
+}
+
+.opp-card .word { font-size: 14px; font-weight: 500; color: var(--accent); }
+.opp-card .pron { font-size: 11px; color: var(--muted); font-style: italic; }
+.opp-card .trans { font-size: 12px; color: var(--text); margin-top: 4px; }
+.opp-divider { text-align: center; color: var(--accent3); font-size: 11px; margin: 4px 0; }
+
+/* Exam */
+.exam-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.exam-q { font-size: 13px; color: var(--text); font-weight: 500; }
+
+.exam-a {
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(91,196,160,.08);
+  border: 1px solid rgba(91,196,160,.2);
+  border-radius: 8px;
+  font-size: 13px; color: var(--accent2);
+  display: none;
+}
+
+.btn-reveal {
+  margin-top: 10px;
+  padding: 7px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px; font-size: 12px; cursor: pointer;
+}
+
+.btn-reveal-all {
+  width: 100%; padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--accent); font-weight: 500;
+  border-radius: 10px; font-size: 13px; cursor: pointer;
+  margin-bottom: 16px;
+}
+
+/* Quiz */
+.quiz-wrap { max-width: 100%; }
+
+.quiz-progress {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+
+.quiz-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; }
+.quiz-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .3s; }
+.quiz-counter { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+.quiz-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 16px;
+  min-height: 120px;
+}
+
+.quiz-q {
+  font-size: 1rem; color: var(--text);
+  text-align: center; font-weight: 500;
+  margin-bottom: 20px; line-height: 1.5;
+}
+
+.quiz-options {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.quiz-opt {
+  padding: 11px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text); font-size: 12px;
+  cursor: pointer; text-align: center;
+  transition: all .15s;
+}
+
+.quiz-opt:active { transform: scale(.97); }
+.quiz-opt.correct { background: rgba(91,196,160,.15); border-color: var(--accent2); color: var(--accent2); }
+.quiz-opt.wrong { background: rgba(224,122,95,.15); border-color: var(--accent3); color: var(--accent3); }
+
+.quiz-result {
+  text-align: center; padding: 30px 20px;
+}
+
+.quiz-score {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem; color: var(--accent);
+}
+
+.quiz-result p { color: var(--muted); margin-top: 8px; font-size: 13px; }
+
+.btn-restart {
+  margin-top: 20px; padding: 13px 30px;
+  background: linear-gradient(135deg, var(--accent), #c9a845);
+  border: none; border-radius: 10px;
+  color: #0f1923; font-weight: 700;
+  font-size: 14px; cursor: pointer;
+}
+
+/* ── BOTTOM NAV ──────────────────────── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 10px 16px 14px;
+  display: flex; justify-content: center;
+  z-index: 100;
+}
+
+.btn-home-nav {
+  padding: 10px 24px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--muted); border-radius: 10px;
+  font-size: 13px; cursor: pointer;
+}
+
+/* Compound words list */
+.compound-list { list-style: none; }
+.compound-list li {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 7px 0; border-bottom: 1px solid rgba(42,61,82,.4);
+  font-size: 13px;
+}
+.compound-list li:last-child { border-bottom: none; }
+.comp-word { color: var(--accent2); font-weight: 500; min-width: 110px; }
+.comp-parts { color: var(--muted); font-size: 11px; }
+.comp-es { color: var(--text); }
+
+/* Verb combo cards */
+.combo-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+}
+.combo-verb { font-weight: 600; color: var(--accent); font-size: 13px; }
+.combo-es { font-size: 12px; color: var(--text); margin-top: 2px; }
+.combo-ex { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+/* responsive */
+@media (max-width: 360px) {
+  .vocab-grid { grid-template-columns: 1fr; }
+  .quiz-options { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ HOME ══════════════ -->
+<div id="home">
+  <div class="home-header">
+    <h1>Inglés Básico</h1>
+    <p>Augusto Ghio · 11 Lecciones</p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="global-progress" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="lessons-grid" id="lessons-grid"></div>
+</div>
+
+<!-- ══════════════ LESSON VIEW ══════════════ -->
+<div id="lesson-view">
+  <div class="lesson-topbar">
+    <button class="btn-back" onclick="goHome()">← Inicio</button>
+    <h2 id="lesson-title"></h2>
+  </div>
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabs-container"></div>
+  </div>
+  <div class="lesson-content" id="lesson-content"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// LESSON DATA
+// ════════════════════════════════════════════════════════
+
+const LESSONS = [
+
+// ─────────────────────── LECCIÓN 1 ───────────────────────
+{
+  num: 1,
+  title: "Primera Lección",
+  subtitle: "Palabras internacionales · IS/ARE · Adjetivos · Verbos",
+  color: "#60a5fa",
+  tabs: [
+    { id:"internat", label:"Palabras Int." },
+    { id:"ing", label:"-ING" },
+    { id:"isare", label:"IS / ARE" },
+    { id:"adj1", label:"Adjetivos" },
+    { id:"verbos1", label:"16 Verbos" },
+    { id:"vocab1", label:"Vocabulario" },
+    { id:"exam1", label:"Examen" },
+    { id:"quiz1", label:"Práctica" },
+  ],
+  panels: {
+    internat: `
+      <div class="section-title">Palabras Idénticas al Español</div>
+      <div class="info-box">Estas palabras se escriben igual (o casi igual) que en español. Solo cambia la <b>pronunciación</b>. ¡Ya las sabes!</div>
+      <div class="vocab-grid">
+        ${[
+          ["Animal","(ánimal)","Animal"],["Base","(béis)","Base"],["Control","(contról)","Control"],
+          ["Hotel","(jotél)","Hotel"],["Opera","(ópera)","Ópera"],["Tango","(tángou)","Tango"],
+          ["Radio","(réidio)","Radio"],["Gas","(gas)","Gas"],["Piano","(piáno)","Piano"],
+          ["Motor","(móutor)","Motor"],["Color","(cólor)","Color"],["Mineral","(míneral)","Mineral"],
+          ["Metal","(métal)","Metal"],["Alcohol","(álcohol)","Alcohol"],["Central","(séntral)","Central"],
+          ["Final","(fáinal)","Final"],["Tropical","(trópical)","Tropical"],["Natural","(náchural)","Natural"],
+          ["Normal","(nórmal)","Normal"],["Total","(tótal)","Total"],["Local","(lóucal)","Local"],
+          ["Canal","(canál)","Canal"],["Capital","(cápital)","Capital"],["Hospital","(jóspital)","Hospital"],
+          ["Material","(matírial)","Material"],["General","(yéneral)","General"],["Sexual","(séksual)","Sexual"],
+          ["Festival","(féstival)","Festival"],["Usual","(iúsual)","Usual"],["Individual","(indivídual)","Individual"],
+          ["Cultural","(cálchural)","Cultural"],["Principal","(prínsipel)","Principal"],["Social","(sóuSHal)","Social"],
+          ["Personal","(pérsonal)","Personal"]
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    ing: `
+      <div class="section-title">Terminación -ING</div>
+      <div class="info-box">En español: <b>-ando / -iendo</b>. En inglés: se agrega <b>-ing</b> al verbo. Si termina en <i>e</i> muda, se quita antes de agregar -ing.</div>
+      <div class="vocab-grid">
+        ${[
+          ["Light → Lighting","(láiting)","Luz → Iluminando"],
+          ["Work → Working","(uérking)","Trabajo → Trabajando"],
+          ["Smile → Smiling","(smáiling)","Sonrisa → Sonriendo"],
+          ["Walk → Walking","(uóking)","Caminar → Caminando"],
+          ["Paint → Painting","(péinting)","Pintar → Pintando"],
+          ["Cry → Crying","(cráiing)","Llorar → Llorando"],
+          ["Play → Playing","(pléiing)","Jugar → Jugando"],
+          ["Rain → Raining","(réining)","Llover → Lloviendo"],
+          ["Read → Reading","(ríiding)","Leer → Leyendo"],
+          ["Come → Coming","(cáming)","Venir → Viniendo"],
+          ["Make → Making","(méiking)","Hacer → Haciendo"],
+          ["Go → Going","(góuing)","Ir → Yendo"],
+          ["Give → Giving","(guíving)","Dar → Dando"],
+          ["See → Seeing","(síiing)","Ver → Viendo"],
+          ["Say → Saying","(séiing)","Decir → Diciendo"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en.split('→')[0].trim()}</div>
+          <div class="vocab-pron">${pron} → <span style="color:var(--accent2)">${en.split('→')[1]?.trim()||''}</span></div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    isare: `
+      <div class="section-title">IS y ARE</div>
+      <div class="info-box">
+        <b>IS</b> = es / está → con <b>He, She, It</b><br>
+        <b>ARE</b> = son / están → con <b>You, We, They</b>
+      </div>
+      <table class="conj-table">
+        <tr><th>Pronombre</th><th>Verbo</th><th>Significado</th></tr>
+        <tr><td>He / She / It</td><td class="en">IS</td><td class="es">es / está</td></tr>
+        <tr><td>You / We / They</td><td class="en">ARE</td><td class="es">son / están</td></tr>
+      </table>
+      <div class="section-title">Frases de práctica</div>
+      ${[
+        ["He is a good boy","Él es un buen niño"],
+        ["She is my sister","Ella es mi hermana"],
+        ["It is very cold","Está muy frío"],
+        ["You are young","Usted es joven"],
+        ["We are in the garden","Estamos en el jardín"],
+        ["They are happy","Ellos son felices"],
+        ["The book is on the table","El libro está sobre la mesa"],
+        ["The boys are tall","Los niños son altos"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    adj1: `
+      <div class="section-title">El Adjetivo en Inglés</div>
+      <div class="info-box">
+        El adjetivo siempre va <b>ANTES</b> del sustantivo.<br>
+        Es completamente <b>invariable</b>: no cambia para masculino, femenino o plural.
+      </div>
+      <div class="vocab-grid">
+        ${[
+          ["A bad boy","Un niño malo"],["A blue sky","Un cielo azul"],
+          ["Clean water","Agua limpia"],["A strong man","Un hombre fuerte"],
+          ["A white dress","Un vestido blanco"],["A good girl","Una niña buena"],
+          ["A young woman","Una mujer joven"],["A black hat","Un sombrero negro"],
+          ["A new house","Una casa nueva"],["A bright light","Una luz brillante"],
+          ["A poor man","Un hombre pobre"],["A deep river","Un río profundo"],
+          ["A sweet fruit","Una fruta dulce"],["A small table","Una mesa pequeña"],
+          ["A wise woman","Una mujer sabia"],["A kind boy","Un niño bondadoso"],
+          ["A dirty street","Una calle sucia"],
+        ].map(([en,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    verbos1: `
+      <div class="section-title">Los 16 Verbos Básicos</div>
+      <div class="info-box">El Inglés Básico solo usa <b>16 verbos</b> para reemplazar a miles. Para el presente: quitar TO + pronombre. <b>He/She/It</b> agrega <b>-s</b>.</div>
+      <table class="conj-table">
+        <tr><th>#</th><th>Infinitivo</th><th>Pron.</th><th>Significado</th></tr>
+        ${[
+          ["1","To come","(cám)","Venir"],["2","To let","(let)","Dejar"],
+          ["3","To go","(gou)","Ir"],["4","To put","(put)","Poner"],
+          ["5","To take","(téik)","Tomar"],["6","To give","(guív)","Dar"],
+          ["7","To get","(guét)","Conseguir"],["8","To keep","(kíip)","Mantener"],
+          ["9","To make","(méik)","Hacer"],["10","To do","(dúu)","Hacer"],
+          ["11","To seem","(síim)","Parecer"],["12","To say","(séi)","Decir"],
+          ["13","To see","(síi)","Ver"],["14","To send","(sénd)","Enviar"],
+          ["15","To be","(bíi)","Ser/Estar"],["16","To have","(jáv)","Tener/Haber"],
+        ].map(([n,inf,pron,es])=>`<tr><td style="color:var(--muted)">${n}</td><td class="en">${inf}</td><td style="color:var(--muted);font-style:italic">${pron}</td><td class="es">${es}</td></tr>`).join('')}
+      </table>`,
+
+    vocab1: `
+      <div class="section-title">Vocabulario — Grupo A</div>
+      <div class="vocab-grid">
+        ${[
+          ["Hat","(jat)","Sombrero"],["Brother","(brádeR)","Hermano"],
+          ["Blue","(blúu)","Azul"],["Garden","(gáardn)","Jardín"],
+          ["Fork","(fóork)","Tenedor"],["Son","(san)","Hijo"],
+          ["Sky","(skái)","Cielo"],["They","(déi)","Ellos"],
+          ["The","(di)","El/La/Los/Las"],["This","(dis)","Este/Esta/Esto"],
+          ["You","(yúu)","Usted/Ustedes"],["Yellow","(yélou)","Amarillo"],
+          ["Day","(déi)","Día"],["Today","(tudéi)","Hoy"],
+          ["Monday","(mándei)","Lunes"],["Apple","(ápel)","Manzana"],
+          ["Bad","(bad)","Malo"],["Boy","(bói)","Niño"],
+          ["Black","(blak)","Negro"],["Clean","(clíin)","Limpio"],
+          ["Deep","(díip)","Profundo"],["Dirty","(déerti)","Sucio"],
+          ["Drink","(drink)","Bebida"],["Dress","(dres)","Vestido"],
+          ["House","(jáus)","Casa"],["Kind","(káind)","Bondadoso"],
+          ["Man","(man)","Hombre"],["New","(niú)","Nuevo"],
+          ["Poor","(púor)","Pobre"],["Plate","(pléit)","Plato"],
+          ["River","(ríver)","Río"],["Strong","(stróng)","Fuerte"],
+          ["Small","(smól)","Pequeño"],["Sweet","(suíit)","Dulce"],
+          ["Table","(téibel)","Mesa"],["Young","(yáng)","Joven"],
+          ["Water","(uóter)","Agua"],["Woman","(úuman)","Mujer"],
+          ["Wise","(uáis)","Sabio"],["White","(juáit)","Blanco"],
+          ["Very","(véri)","Muy"],["Good","(gud)","Bueno"],
+          ["Tree","(tríi)","Árbol"],["Baby","(béibi)","Bebé"],
+          ["Mountain","(máunten)","Montaña"],["Green","(gríin)","Verde"],
+          ["Map","(map)","Mapa"],["Road","(róud)","Camino"],
+          ["And","(and)","Y"],["Ill","(il)","Enfermo"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    exam1: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Qué son las palabras internacionales?","Palabras que se escriben igual (o similar) en inglés y español, solo cambia la pronunciación."],
+        ["¿Dónde va el adjetivo en inglés?","Siempre ANTES del sustantivo. Ejemplo: A good boy (un niño bueno)."],
+        ["¿Cambia el adjetivo según género o número?","No. El adjetivo inglés es completamente invariable."],
+        ["¿Qué significa -ing al final de un verbo?","Equivale a -ando / -iendo en español. Ejemplo: Working = Trabajando."],
+        ["¿Cuándo se usa IS y cuándo ARE?","IS con He/She/It. ARE con You/We/They."],
+        ["Traduce: 'A blue sky'","Un cielo azul"],
+        ["Traduce: 'She is my sister'","Ella es mi hermana"],
+        ["Traduce: 'We are in the garden'","Estamos en el jardín"],
+        ["¿Cuántos verbos básicos hay?","16 verbos básicos"],
+        ["¿Cómo se forma el presente de los verbos básicos?","Quitar TO y usar el pronombre. He/She/It agrega -s al final."],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz1: quiz([
+      ["¿Cómo se dice 'Trabajando'?","Working","Workful","Worken","Workly","Working"],
+      ["¿Qué significa 'IS'?","Es / Está","Son / Están","Ser / Estar","Estamos","Es / Está"],
+      ["El adjetivo en inglés va...","Antes del sustantivo","Después del sustantivo","Al final","En cualquier lugar","Antes del sustantivo"],
+      ["¿Cómo se dice 'Un cielo azul'?","A blue sky","A sky blue","Blue a sky","Sky blue a","A blue sky"],
+      ["¿Qué pronombres usan ARE?","You/We/They","He/She/It","I","He/She","You/We/They"],
+      ["'To give' significa...","Dar","Ir","Venir","Mantener","Dar"],
+      ["¿Cómo se dice 'Viniendo'?","Coming","Comeing","Comming","Comed","Coming"],
+      ["'Water' significa...","Agua","Viento","Tierra","Fuego","Agua"],
+      ["¿Cuántos verbos básicos tiene el sistema?","16","12","20","8","16"],
+      ["'To keep' significa...","Mantener","Tomar","Poner","Dejar","Mantener"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 2 ───────────────────────
+{
+  num: 2,
+  title: "Segunda Lección",
+  subtitle: "Meses · Días · Pronombres · Tiempo Futuro · Gerundio",
+  color: "#a78bfa",
+  tabs: [
+    { id:"meses", label:"Meses/Días" },
+    { id:"pronombres", label:"Pronombres" },
+    { id:"presente2", label:"Presente" },
+    { id:"futuro", label:"Futuro (WILL)" },
+    { id:"gerundio", label:"Gerundio" },
+    { id:"articulos", label:"A / AN" },
+    { id:"vocab2", label:"Vocabulario" },
+    { id:"exam2", label:"Examen" },
+    { id:"quiz2", label:"Práctica" },
+  ],
+  panels: {
+    meses: `
+      <div class="section-title">Meses del Año</div>
+      <div class="vocab-grid">
+        ${[
+          ["January","(yánuari)","Enero"],["February","(fébruari)","Febrero"],
+          ["March","(máarch)","Marzo"],["April","(éipril)","Abril"],
+          ["May","(méi)","Mayo"],["June","(yúun)","Junio"],
+          ["July","(yuulái)","Julio"],["August","(óoguest)","Agosto"],
+          ["September","(septémber)","Septiembre"],["October","(octóuber)","Octubre"],
+          ["November","(novémber)","Noviembre"],["December","(disémber)","Diciembre"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>
+      <div class="section-title">Días de la Semana</div>
+      <div class="vocab-grid">
+        ${[
+          ["Monday","(mándei)","Lunes"],["Tuesday","(tiúsdei)","Martes"],
+          ["Wednesday","(uénsdei)","Miércoles"],["Thursday","(zérsdei)","Jueves"],
+          ["Friday","(fráidei)","Viernes"],["Saturday","(sáterdei)","Sábado"],
+          ["Sunday","(sándei)","Domingo"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>
+      <div class="info-box" style="margin-top:12px">Para decir <b>el lunes, el martes...</b> se usa <b>on Monday, on Tuesday...</b> etc.</div>`,
+
+    pronombres: `
+      <div class="section-title">Pronombres Personales</div>
+      <table class="conj-table">
+        <tr><th>Inglés</th><th>Pron.</th><th>Español</th></tr>
+        ${[
+          ["I","(ái)","Yo"],["You","(yúu)","Usted / Ustedes"],
+          ["He","(jíi)","Él"],["She","(SHíi)","Ella"],
+          ["It","(it)","Él / Ella (cosas)"],["We","(uí)","Nosotros/as"],
+          ["They","(déi)","Ellos / Ellas"],
+        ].map(([en,pron,es])=>`<tr><td class="en">${en}</td><td style="color:var(--muted);font-style:italic">${pron}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="info-box" style="margin-top:12px"><b>IT</b> se usa para cosas, no para personas. <b>HE/SHE</b> solo para personas.</div>`,
+
+    presente2: `
+      <div class="section-title">Tiempo Presente — Los 16 Verbos</div>
+      <div class="info-box">Regla: quitar <b>TO</b> + pronombre. <b>He/She/It</b> agrega <b>-s</b> (o <b>-es</b> en algunos).</div>
+      <table class="conj-table">
+        <tr><th>Pronombre</th><th>To Put</th><th>To Go</th><th>To Do</th></tr>
+        ${[
+          ["I","put","go","do"],["You","put","go","do"],
+          ["He/She/It","puts","goes","does"],
+          ["We","put","go","do"],["They","put","go","do"],
+        ].map(([p,a,b,c])=>`<tr><td>${p}</td><td class="en">${a}</td><td class="en">${b}</td><td class="en">${c}</td></tr>`).join('')}
+      </table>
+      <div class="info-box">Goes se pronuncia <b>(gós)</b>. Does se pronuncia <b>(dás)</b>.</div>`,
+
+    futuro: `
+      <div class="section-title">Tiempo Futuro con WILL</div>
+      <div class="info-box"><b>WILL</b> (uíl) + verbo infinitivo = futuro. Una sola palabra reemplaza todos los futuros del español.</div>
+      <table class="conj-table">
+        <tr><th>Presente</th><th>Futuro</th><th>Español</th></tr>
+        ${[
+          ["I go","I will go","Yo iré"],["He keeps","He will keep","Él mantendrá"],
+          ["You let","You will let","Usted dejará"],["We do","We will do","Nosotros haremos"],
+          ["They make","They will make","Ellos harán"],["She sees","She will see","Ella verá"],
+          ["I have","I will have","Yo tendré"],["We send","We will send","Enviaremos"],
+        ].map(([p,f,es])=>`<tr><td style="color:var(--muted)">${p}</td><td class="en">${f}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Frases de práctica</div>
+      ${[
+        ["I will go to Buenos Aires","Yo iré a Buenos Aires"],
+        ["He will say that","Él dirá eso"],
+        ["We will send a letter","Enviaremos una carta"],
+        ["I will go on Thursday","Iré el Jueves"],
+        ["He will come on Friday","Él vendrá el Viernes"],
+        ["We will be in the garden","Estaremos en el jardín"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    gerundio: `
+      <div class="section-title">Gerundio (-ING)</div>
+      <div class="info-box">El gerundio se forma añadiendo <b>-ing</b> al verbo. Equivale a <b>-ando / -iendo</b> en español.</div>
+      <table class="conj-table">
+        <tr><th>Verbo</th><th>Gerundio</th><th>Pron.</th><th>Español</th></tr>
+        ${[
+          ["To come","Coming","(cáming)","Viniendo"],
+          ["To do","Doing","(dúuing)","Haciendo"],
+          ["To give","Giving","(guíving)","Dando"],
+          ["To go","Going","(góuing)","Yendo"],
+          ["To make","Making","(méiking)","Haciendo"],
+          ["To say","Saying","(séiing)","Diciendo"],
+          ["To see","Seeing","(síiing)","Viendo"],
+          ["To take","Taking","(téiking)","Tomando"],
+          ["To keep","Keeping","(kíiping)","Manteniendo"],
+          ["To let","Letting","(léting)","Dejando"],
+          ["To put","Putting","(púting)","Poniendo"],
+          ["To send","Sending","(sénding)","Enviando"],
+          ["To seem","Seeming","(síiming)","Pareciendo"],
+        ].map(([v,g,pron,es])=>`<tr><td style="color:var(--muted)">${v}</td><td class="en">${g}</td><td style="color:var(--muted);font-style:italic;font-size:11px">${pron}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Frases con Gerundio</div>
+      ${[
+        ["We are going to Argentina","Estamos yendo a Argentina"],
+        ["I am sending a letter to your friend","Estoy enviando una carta a su amigo"],
+        ["My brother is going to the river","Mi hermano está yendo al río"],
+        ["My father is coming by train","Mi padre está viniendo por tren"],
+        ["He is taking a rest","Él está tomando un descanso"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    articulos: `
+      <div class="section-title">El Artículo Indefinido: A / AN</div>
+      <div class="info-box">
+        <b>A</b> = un / una → antes de consonante<br>
+        <b>AN</b> = un / una → antes de vocal<br>
+        Ambas significan exactamente lo mismo.
+      </div>
+      <table class="conj-table">
+        <tr><th>Artículo</th><th>Ejemplo</th><th>Español</th></tr>
+        ${[
+          ["A","A woman","Una mujer"],["A","A book","Un libro"],
+          ["A","A boy","Un niño"],["AN","An apple","Una manzana"],
+          ["AN","An army","Un ejército"],["AN","An angry man","Un hombre enojado"],
+          ["AN","An old woman","Una mujer vieja"],
+        ].map(([art,ex,es])=>`<tr><td class="en">${art}</td><td class="en">${ex}</td><td>${es}</td></tr>`).join('')}
+      </table>`,
+
+    vocab2: `
+      <div class="section-title">Vocabulario Nuevo</div>
+      <div class="vocab-grid">
+        ${[
+          ["Money","(mani)","Dinero"],["Letter","(léter)","Carta"],
+          ["Your","(yúar)","Su (de usted)"],["His","(jiz)","Su (de él)"],
+          ["Bread","(bred)","Pan"],["Father","(fáader)","Padre"],
+          ["By","(bai)","Por"],["With","(uíz)","Con"],
+          ["Journey","(yérni)","Viaje"],["But","(bat)","Pero"],
+          ["Morning","(mórning)","Mañana (tiempo)"],["Tomorrow","(tumórou)","Mañana (día)"],
+          ["All","(ól)","Todo/Todos"],["Word","(uérd)","Palabra"],
+          ["Book","(buk)","Libro"],["Friend","(frend)","Amigo"],
+          ["Old","(óuld)","Viejo"],["On","(on)","Sobre/En"],
+          ["For","(foor)","Para"],["Wrong","(rong)","Equivocado"],
+          ["Time","(táim)","Tiempo"],["Meal","(míil)","Comida"],
+          ["Train","(tréin)","Tren"],["Thin","(zin)","Delgado"],
+          ["Peace","(píis)","Paz"],["War","(uór)","Guerra"],
+          ["Summer","(sámer)","Verano"],["Winter","(uínter)","Invierno"],
+          ["East","(íist)","Este"],["West","(uést)","Oeste"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    exam2: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["Traduce: 'I will go'","I will go → Yo iré"],
+        ["¿Cómo se forma el tiempo futuro?","Anteponiendo WILL al infinitivo del verbo"],
+        ["¿Cuál es la diferencia entre A y AN?","Ninguna; ambas = 'un/una'. AN se usa antes de vocal."],
+        ["Traduce los días de la semana","Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday"],
+        ["Traduce los meses del año","January, February, March, April, May, June, July, August, September, October, November, December"],
+        ["Traduce: 'Coming' al español","Viniendo"],
+        ["Traduce: 'He will come today'","Él vendrá hoy"],
+        ["¿Cómo se dice 'el lunes'?","On Monday"],
+        ["Traduce: 'We will send a letter'","Enviaremos una carta"],
+        ["¿Qué es el gerundio? ¿Cómo se forma?","Equivale a -ando/-iendo. Se forma añadiendo -ING al verbo."],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz2: quiz([
+      ["¿Cómo se dice 'Febrero'?","February","Febrery","Februray","Februarii","February"],
+      ["¿Cómo se forma el futuro en inglés?","WILL + verbo","Verbo + WILL","SHALL + verbo","Verbo + ED","WILL + verbo"],
+      ["'Going' significa...","Yendo","Haciendo","Viniendo","Diciendo","Yendo"],
+      ["¿Cuándo se usa AN?","Antes de vocal","Antes de consonante","Siempre","Nunca","Antes de vocal"],
+      ["¿Cómo se dice 'el viernes'?","On Friday","In Friday","At Friday","The Friday","On Friday"],
+      ["'Tomorrow' significa...","Mañana (día)","Ayer","Hoy","Tarde","Mañana (día)"],
+      ["'We will see' significa...","Nosotros veremos","Nosotros vemos","Nosotros veíamos","Nosotros veríamos","Nosotros veremos"],
+      ["¿Cómo se dice 'Agosto'?","August","Agosto","Augost","Agust","August"],
+      ["'Saying' significa...","Diciendo","Yendo","Viendo","Dando","Diciendo"],
+      ["'Peace' significa...","Paz","Guerra","Amor","Miedo","Paz"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 3 ───────────────────────
+{
+  num: 3,
+  title: "Tercera Lección",
+  subtitle: "THE · WOULD · MAY · MIGHT · Plural · Números · -LY · Palabras compuestas",
+  color: "#34d399",
+  tabs: [
+    { id:"the", label:"THE" },
+    { id:"would", label:"WOULD" },
+    { id:"maymight", label:"MAY / MIGHT" },
+    { id:"plural3", label:"Plural" },
+    { id:"numeros", label:"Números" },
+    { id:"ly", label:"Terminación -LY" },
+    { id:"compuestas3", label:"Compuestas" },
+    { id:"exam3", label:"Examen" },
+    { id:"quiz3", label:"Práctica" },
+  ],
+  panels: {
+    the: `
+      <div class="section-title">El Artículo Definido: THE</div>
+      <div class="info-box"><b>THE</b> (di) = El / La / Los / Las / Lo<br>Una sola palabra reemplaza todos los artículos definidos del español.</div>
+      <table class="conj-table">
+        <tr><th>Expresión</th><th>Significado</th></tr>
+        ${[
+          ["The (di)","El / La / Los / Las / Lo"],
+          ["To the (tu di)","A la / Al / A los / A las"],
+          ["Of the (ov di)","De la / Del / De los / De las"],
+        ].map(([en,es])=>`<tr><td class="en">${en}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Frases con THE</div>
+      ${[
+        ["The pencil","El lápiz"],["The house","La casa"],
+        ["The road to the river","El camino al río"],
+        ["The top of the mountain","La cumbre de la montaña"],
+        ["The boys","Los niños"],["The apples","Las manzanas"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    would: `
+      <div class="section-title">Tiempo Condicional con WOULD</div>
+      <div class="info-box"><b>WOULD</b> (úud) + verbo = condicional. Equivale a las formas en <b>-ría</b> del español (haría, iría, enviaría...).</div>
+      <table class="conj-table">
+        <tr><th>Presente</th><th>Condicional</th><th>Español</th></tr>
+        ${[
+          ["I make","I would make","Yo haría"],
+          ["I go","I would go","Yo iría"],
+          ["We send","We would send","Enviaríamos"],
+          ["He says","He would say","Él diría"],
+          ["You see","You would see","Usted vería"],
+          ["They let","They would let","Ellos dejarían"],
+          ["She keeps","She would keep","Ella mantendría"],
+          ["I have","I would have","Yo tendría"],
+        ].map(([p,c,es])=>`<tr><td style="color:var(--muted)">${p}</td><td class="en">${c}</td><td>${es}</td></tr>`).join('')}
+      </table>`,
+
+    maymight: `
+      <div class="section-title">MAY — Posibilidad presente</div>
+      <div class="info-box"><b>MAY</b> (méi) indica posibilidad de hacer algo = "puede que..."</div>
+      ${[
+        ["I may get","Yo puedo conseguir"],["They may have","Ellos pueden tener"],
+        ["You may come","Usted puede venir"],["She may do","Ella puede hacer"],
+        ["We may go","Nosotros podemos ir"],["He may let","Él puede dejar"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}
+      <div class="section-title" style="margin-top:20px">MIGHT — Posibilidad futura</div>
+      <div class="info-box"><b>MIGHT</b> (mait) indica posibilidad futura = "podría..."</div>
+      ${[
+        ["We might send","Podríamos enviar"],["You might go","Usted podría ir"],
+        ["I might go","Yo podría ir"],["He might get","Él podría conseguir"],
+        ["They might say","Ellos podrían decir"],["I might make","Yo podría hacer"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    plural3: `
+      <div class="section-title">Plural de los Sustantivos</div>
+      <div class="info-box">Regla general: agregar <b>-S</b> al final.<br>Si termina en <b>Y</b> precedida de consonante → cambiar Y por <b>-IES</b>.</div>
+      <div class="vocab-grid">
+        ${[
+          ["Boy → Boys","Niño → Niños"],["Girl → Girls","Niña → Niñas"],
+          ["Book → Books","Libro → Libros"],["House → Houses","Casa → Casas"],
+          ["Body → Bodies","Cuerpo → Cuerpos"],["Army → Armies","Ejército → Ejércitos"],
+          ["Baby → Babies","Bebé → Bebés"],["Lady → Ladies","Señora → Señoras"],
+        ].map(([en,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en.split('→')[0].trim()}</div>
+          <div class="vocab-pron">→ <span style="color:var(--accent2)">${en.split('→')[1]?.trim()||''}</span></div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>
+      <div class="info-box" style="margin-top:12px">Excepción: si la Y va precedida de vocal, solo se agrega <b>-S</b>. Ejemplo: Boy → Boys (no Boies).</div>`,
+
+    numeros: `
+      <div class="section-title">Los Números</div>
+      <div class="vocab-grid">
+        ${[
+          ["1 — One","(uán)"],["2 — Two","(túu)"],["3 — Three","(zríi)"],
+          ["4 — Four","(fóor)"],["5 — Five","(fáiv)"],["6 — Six","(siks)"],
+          ["7 — Seven","(séven)"],["8 — Eight","(éit)"],["9 — Nine","(náin)"],
+          ["10 — Ten","(ten)"],["11 — Eleven","(ilévn)"],["12 — Twelve","(tuélv)"],
+          ["13 — Thirteen","(zertíin)"],["14 — Fourteen","(fórtíin)"],["15 — Fifteen","(fiftíin)"],
+          ["16 — Sixteen","(sikstíin)"],["17 — Seventeen","(séventíin)"],["18 — Eighteen","(éitíin)"],
+          ["19 — Nineteen","(náintíin)"],["20 — Twenty","(tuénti)"],["21 — Twenty-one","(tuénti-uán)"],
+          ["30 — Thirty","(zérti)"],["40 — Forty","(fórti)"],["50 — Fifty","(fífti)"],
+          ["60 — Sixty","(síksti)"],["70 — Seventy","(séventi)"],["80 — Eighty","(éiti)"],
+          ["90 — Ninety","(náinti)"],["100 — One hundred","(uán jándred)"],["1000 — One thousand","(uán záuzand)"],
+        ].map(([num,pron])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${num}</div>
+          <div class="vocab-pron">${pron}</div>
+        </div>`).join('')}
+      </div>`,
+
+    ly: `
+      <div class="section-title">Terminación -LY</div>
+      <div class="info-box">Añadir <b>-LY</b> a un adjetivo lo convierte en adverbio. Equivale a <b>-mente</b> en español.</div>
+      <table class="conj-table">
+        <tr><th>Adjetivo</th><th>Adverbio</th><th>Español</th></tr>
+        ${[
+          ["Clear","Clearly","Claramente"],["Cruel","Cruelly","Cruelmente"],
+          ["Rough","Roughly","Toscamente"],["Solid","Solidly","Sólidamente"],
+          ["Deep","Deeply","Profundamente"],["Feeble","Feebly","Débilmente"],
+          ["Open","Openly","Abiertamente"],["Quick","Quickly","Rápidamente"],
+          ["Violent","Violently","Violentamente"],["Bright","Brightly","Brillantemente"],
+          ["Narrow","Narrowly","Estrechamente"],["Normal","Normally","Normalmente"],
+          ["Wise","Wisely","Sabiamente"],["Free","Freely","Libremente"],
+          ["Frequent","Frequently","Frecuentemente"],["Separate","Separately","Separadamente"],
+        ].map(([adj,adv,es])=>`<tr><td style="color:var(--muted)">${adj}</td><td class="en">${adv}</td><td>${es}</td></tr>`).join('')}
+      </table>`,
+
+    compuestas3: `
+      <div class="section-title">Palabras Compuestas</div>
+      <div class="info-box">En inglés es muy común unir dos palabras para formar una nueva con un nuevo significado.</div>
+      <ul class="compound-list">
+        ${[
+          ["School-girl","escuela + niña","Colegiala"],
+          ["Plough-man","arado + hombre","Arador"],
+          ["Milkman","leche + hombre","Lechero"],
+          ["Foot-ball","pie + pelota","Fútbol"],
+          ["Horseman","caballo + hombre","Jinete"],
+          ["Letter-box","carta + caja","Buzón"],
+          ["Sun-light","sol + luz","Luz del sol"],
+          ["Footprint","pie + impreso","Huella"],
+          ["School-book","escuela + libro","Libro escolar"],
+          ["Water-pipe","agua + cañería","Cañería de agua"],
+          ["Trade mark","comercio + marca","Marca de fábrica"],
+          ["Way-out","camino + afuera","Salida"],
+          ["Fireman","fuego + hombre","Bombero"],
+          ["Everyday","cada + día","Todos los días"],
+        ].map(([word,parts,es])=>`
+        <li>
+          <span class="comp-word">${word}</span>
+          <span>
+            <span class="comp-es">${es}</span>
+            <span class="comp-parts"> (${parts})</span>
+          </span>
+        </li>`).join('')}
+      </ul>`,
+
+    exam3: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Cómo se forma el condicional en inglés?","Anteponiendo WOULD al verbo infinitivo"],
+        ["¿Cuándo se usa MAY y cuándo MIGHT?","MAY para posibilidad presente; MIGHT para posibilidad futura"],
+        ["¿Son variables o invariables los adjetivos ingleses?","Invariables — no cambian según género ni número"],
+        ["¿Cómo se forma el plural de los sustantivos?","Agregando -S. Si termina en Y (con consonante antes): -IES"],
+        ["Traduce: 'We would send a letter'","Enviaríamos una carta"],
+        ["Traduce: 'I might go'","Yo podría ir"],
+        ["Traduce: 'Quickly'","Rápidamente"],
+        ["¿Qué significa 'Fireman'?","Bombero (fire=fuego + man=hombre)"],
+        ["¿Qué significa THE?","El / La / Los / Las / Lo"],
+        ["Traduce los números 1-10 al inglés","One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten"],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz3: quiz([
+      ["¿Cómo se dice 'Claramente'?","Clearly","Clearful","Clearment","Clearsome","Clearly"],
+      ["WOULD equivale a...","Condicional (-ría)","Futuro (-rá)","Presente","Pasado","Condicional (-ría)"],
+      ["¿Qué significa 'Milkman'?","Lechero","Panadero","Carnicero","Jardinero","Lechero"],
+      ["'Army → ___' (plural)","Armies","Armys","Armyes","Army","Armies"],
+      ["¿Cuánto es 'Fifteen'?","15","14","16","50","15"],
+      ["MAY indica...","Posibilidad presente","Posibilidad futura","Obligación","Futuro","Posibilidad presente"],
+      ["THE en español equivale a...","El/La/Los/Las","Un/Una","Este/Esta","Mi/Tu","El/La/Los/Las"],
+      ["'Deeply' significa...","Profundamente","Claramente","Libremente","Rápidamente","Profundamente"],
+      ["¿Cuánto es 'Ninety'?","90","19","70","80","90"],
+      ["MIGHT indica...","Posibilidad futura","Posibilidad presente","Certeza","Prohibición","Posibilidad futura"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 4 ───────────────────────
+{
+  num: 4,
+  title: "Cuarta Lección",
+  subtitle: "Ordinales · Pasado · Do/Make · -ED · To Have",
+  color: "#f59e0b",
+  tabs: [
+    { id:"ordinales", label:"Ordinales" },
+    { id:"pasado4", label:"Tiempo Pasado" },
+    { id:"domake", label:"Do / Make" },
+    { id:"ed4", label:"Terminación -ED" },
+    { id:"tohave", label:"To Have" },
+    { id:"vocab4", label:"Vocabulario" },
+    { id:"exam4", label:"Examen" },
+    { id:"quiz4", label:"Práctica" },
+  ],
+  panels: {
+    ordinales: `
+      <div class="section-title">Números Ordinales</div>
+      <div class="info-box">Regla: agregar <b>-TH</b> al cardinal. Excepciones: First, Second, Third, Fifth, Eighth, Ninth, Twelfth.</div>
+      <div class="vocab-grid">
+        ${[
+          ["First","(féerst)","Primero"],["Second","(sécond)","Segundo"],
+          ["Third","(zéerd)","Tercero"],["Fourth","(fóorz)","Cuarto"],
+          ["Fifth","(fífz)","Quinto"],["Sixth","(síkz)","Sexto"],
+          ["Seventh","(sévenz)","Séptimo"],["Eighth","(éitz)","Octavo"],
+          ["Ninth","(náinz)","Noveno"],["Tenth","(ténz)","Décimo"],
+          ["Eleventh","(ilévenz)","Undécimo"],["Twelfth","(tuélvz)","Duodécimo"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    pasado4: `
+      <div class="section-title">Pasado de los Verbos Básicos</div>
+      <div class="info-box">El pasado es <b>invariable</b>: la misma forma para todas las personas. No hay conjugaciones distintas.</div>
+      <table class="conj-table">
+        <tr><th>Verbo</th><th>Pasado</th><th>Pron.</th><th>Español</th></tr>
+        ${[
+          ["To take","took","(túk)","Tomé/tomó/tomamos..."],
+          ["To put","put","(put)","Puse/puso/pusimos..."],
+          ["To send","sent","(sent)","Envié/envió..."],
+          ["To get","got","(gót)","Conseguí/consiguió..."],
+          ["To say","said","(sed)","Dije/dijo..."],
+          ["To do","did","(did)","Hice/hizo..."],
+          ["To make","made","(méid)","Hice/hizo..."],
+          ["To go","went","(uent)","Fui/fue..."],
+          ["To give","gave","(guéiv)","Di/dio..."],
+          ["To come","came","(kéim)","Vine/vino..."],
+          ["To see","saw","(só)","Vi/vio..."],
+          ["To keep","kept","(kept)","Mantuve/mantuvo..."],
+          ["To let","let","(let)","Dejé/dejó..."],
+        ].map(([v,p,pron,es])=>`<tr><td style="color:var(--muted)">${v}</td><td class="en">${p}</td><td style="color:var(--muted);font-style:italic;font-size:11px">${pron}</td><td style="font-size:11px">${es}</td></tr>`).join('')}
+      </table>`,
+
+    domake: `
+      <div class="section-title">DO vs MAKE</div>
+      <div class="info-box">
+        <b>MAKE</b> = fabricar algo material (una mesa, una casa)<br>
+        <b>DO</b> = acción inmaterial (trabajo, tarea, ejercicio)
+      </div>
+      <div class="vocab-grid">
+        ${[
+          ["To make a table","Hacer una mesa"],["To make bread","Hacer pan"],
+          ["To make a dress","Hacer un vestido"],["To make a discovery","Descubrir"],
+          ["To do work","Hacer (el) trabajo"],["To do exercises","Hacer ejercicios"],
+          ["To do a task","Hacer una tarea"],["To do this","Hacer esto"],
+        ].map(([en,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    ed4: `
+      <div class="section-title">Terminación -ED (Participio)</div>
+      <div class="info-box">Muchos verbos regulares forman su pasado y participio agregando <b>-ED</b>. Si termina en <b>Y</b>: cambiar Y por <b>-IED</b>.</div>
+      <div class="vocab-grid">
+        ${[
+          ["Work → Worked","Trabajar → Trabajado"],
+          ["Help → Helped","Ayudar → Ayudado"],
+          ["Paint → Painted","Pintar → Pintado"],
+          ["Lock → Locked","Cerrar → Cerrado"],
+          ["Attack → Attacked","Atacar → Atacado"],
+          ["Cook → Cooked","Cocinar → Cocinado"],
+          ["Copy → Copied","Copiar → Copiado"],
+          ["Study → Studied","Estudiar → Estudiado"],
+          ["Wash → Washed","Lavar → Lavado"],
+          ["Talk → Talked","Conversar → Conversado"],
+        ].map(([en,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en.split('→')[0].trim()}</div>
+          <div class="vocab-pron">→ <span style="color:var(--accent2)">${en.split('→')[1]?.trim()||''}</span></div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    tohave: `
+      <div class="section-title">Conjugación de TO HAVE</div>
+      <div class="info-box">Solo <b>He/She/It</b> usa <b>HAS</b> en presente. El resto usa HAVE.</div>
+      <table class="conj-table">
+        <tr><th>Pronombre</th><th>Presente</th><th>Pasado</th><th>Futuro</th></tr>
+        ${[
+          ["I","have","had","will have"],
+          ["You","have","had","will have"],
+          ["He/She/It","has","had","will have"],
+          ["We","have","had","will have"],
+          ["They","have","had","will have"],
+        ].map(([p,pr,pa,f])=>`<tr><td>${p}</td><td class="en">${pr}</td><td class="en">${pa}</td><td class="en">${f}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Formas especiales</div>
+      <table class="conj-table">
+        <tr><th>Inglés</th><th>Español</th></tr>
+        ${[
+          ["would have","habría"],["may have","puede haber"],
+          ["might have","podría haber"],["if I had","si yo tuviera"],
+          ["I have sent","He enviado"],["He has taken","Él ha tomado"],
+        ].map(([en,es])=>`<tr><td class="en">${en}</td><td>${es}</td></tr>`).join('')}
+      </table>`,
+
+    vocab4: `
+      <div class="section-title">Vocabulario</div>
+      <div class="vocab-grid">
+        ${[
+          ["True","(trúu)","Verdadero"],["Mother","(máder)","Madre"],
+          ["Shirt","(SHert)","Camisa"],["Boat","(bóut)","Bote"],
+          ["Food","(fuud)","Alimento"],["Eye","(ái)","Ojo"],
+          ["Beautiful","(biútiful)","Hermoso"],["Sticky","(stíki)","Pegajoso"],
+          ["Yellow","(yélou)","Amarillo"],["Healthy","(jélzi)","Saludable"],
+          ["Broken","(bróuken)","Roto"],["Serious","(síirios)","Serio"],
+          ["Narrow","(nárou)","Estrecho"],["Happy","(jápi)","Feliz"],
+          ["Tired","(táired)","Cansado"],["One day","(uán déi)","Un día"],
+          ["Tonight","(tunáit)","Esta noche"],["Every day","(évri déi)","Cada día"],
+          ["Rain-water","(réin-uóter)","Agua de lluvia"],["Backbone","(bákboun)","Columna vertebral"],
+          ["Daylight","(déilait)","Luz del día"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    exam4: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Cómo se llama el primer número ordinal?","First (primero)"],
+        ["¿Cuál es el pasado de TO GO?","Went"],
+        ["¿Cuál es el pasado de TO SEE?","Saw"],
+        ["¿Cuándo se usa MAKE vs DO?","MAKE = fabricar algo material. DO = acción inmaterial/tarea."],
+        ["¿Cuál es el pasado de TO GIVE?","Gave"],
+        ["¿Cómo se forma el participio de verbos regulares?","Añadiendo -ED (o -IED si termina en Y)"],
+        ["¿Qué forma usa He/She/It en presente de TO HAVE?","HAS (no HAVE)"],
+        ["Traduce: 'I took the book'","Yo tomé el libro"],
+        ["Traduce: 'She kept her word'","Ella mantuvo su palabra"],
+        ["¿Qué significa 'Twelfth'?","Duodécimo (12°)"],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz4: quiz([
+      ["¿Cuál es el pasado de 'To go'?","Went","Goed","Gone","Go","Went"],
+      ["¿Qué ordinal es 'Third'?","Tercero","Primero","Segundo","Cuarto","Tercero"],
+      ["¿Cuándo se usa MAKE?","Fabricar algo material","Acción inmaterial","Siempre","Nunca","Fabricar algo material"],
+      ["¿Cuál es el pasado de 'To see'?","Saw","Seed","Seen","Sawed","Saw"],
+      ["'Tired' significa...","Cansado","Feliz","Serio","Estrecho","Cansado"],
+      ["He/She/It usa... en presente de TO HAVE","HAS","HAVE","HAD","HAVING","HAS"],
+      ["¿Cuál es el ordinal de 8?","Eighth","Eighteenth","Eightieth","Eight","Eighth"],
+      ["¿Cuál es el pasado de 'To keep'?","Kept","Keeped","Keped","Keep","Kept"],
+      ["¿Cuál es el pasado de 'To send'?","Sent","Sended","Send","Sund","Sent"],
+      ["'Beautiful' significa...","Hermoso","Serio","Roto","Saludable","Hermoso"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 5 ───────────────────────
+{
+  num: 5,
+  title: "Quinta Lección",
+  subtitle: "TO BE completo · Terminaciones ER/OR · Presente compuesto",
+  color: "#f472b6",
+  tabs: [
+    { id:"tobe5", label:"TO BE" },
+    { id:"eroror", label:"ER / OR" },
+    { id:"precompuesto", label:"Pres. Compuesto" },
+    { id:"compuestas5", label:"Palabras comp." },
+    { id:"exam5", label:"Examen" },
+    { id:"quiz5", label:"Práctica" },
+  ],
+  panels: {
+    tobe5: `
+      <div class="section-title">Conjugación completa de TO BE</div>
+      <table class="conj-table">
+        <tr><th>Pronombre</th><th>Presente</th><th>Pasado</th><th>Futuro</th><th>Condicional</th></tr>
+        ${[
+          ["I","am","was","will be","would be"],
+          ["You","are","were","will be","would be"],
+          ["He/She/It","is","was","will be","would be"],
+          ["We","are","were","will be","would be"],
+          ["They","are","were","will be","would be"],
+        ].map(([p,a,b,c,d])=>`<tr><td>${p}</td><td class="en">${a}</td><td class="en">${b}</td><td class="en">${c}</td><td class="en">${d}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Formas con MAY y MIGHT</div>
+      <table class="conj-table">
+        <tr><th>Inglés</th><th>Español</th></tr>
+        ${[
+          ["I may be","Yo puedo ser/estar"],["You may be","Usted puede ser/estar"],
+          ["He might be","Él podría ser/estar"],["They might be","Ellos podrían ser/estar"],
+          ["If I were","Si yo fuera"],
+        ].map(([en,es])=>`<tr><td class="en">${en}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Frases de práctica</div>
+      ${[
+        ["She was in the garden","Ella estaba en el jardín"],
+        ["He was a good painter","Él era un buen pintor"],
+        ["We were in London","Estuvimos en Londres"],
+        ["He will be here tonight","Él estará aquí esta noche"],
+        ["I am happy","Yo soy feliz"],["He might be here","Él podría estar aquí"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    eroror: `
+      <div class="section-title">Terminaciones -ER y -OR</div>
+      <div class="info-box">Agregar <b>-ER</b> u <b>-OR</b> a un sustantivo o verbo crea a la persona que lo hace. Como en español: jardín → jardinero.</div>
+      <div class="vocab-grid">
+        ${[
+          ["Box → Boxer","Boxeo → Boxeador"],["Farm → Farmer","Hacienda → Hacendado"],
+          ["Help → Helper","Ayuda → Ayudante"],["Smoke → Smoker","Humo → Fumador"],
+          ["Trade → Trader","Comercio → Comerciante"],["Paint → Painter","Pintura → Pintor"],
+          ["Work → Worker","Trabajo → Trabajador"],["Print → Printer","Impreso → Impresor"],
+          ["Mine → Miner","Mina → Minero"],["Sail → Sailor","Vela → Marinero"],
+          ["Design → Designer","Diseño → Diseñador"],["Garden → Gardener","Jardín → Jardinero"],
+        ].map(([en,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en.split('→')[0].trim()}</div>
+          <div class="vocab-pron">→ <span style="color:var(--accent2)">${en.split('→')[1]?.trim()||''}</span></div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    precompuesto: `
+      <div class="section-title">El Presente Compuesto</div>
+      <div class="info-box">Se forma con el <b>presente de TO BE</b> + <b>gerundio (-ING)</b>. En inglés es más común que el presente simple.</div>
+      <table class="conj-table">
+        <tr><th>Simple</th><th>Compuesto</th><th>Español</th></tr>
+        ${[
+          ["I go","I am going","Estoy yendo"],
+          ["They send","They are sending","Están enviando"],
+          ["He says","He is saying","Está diciendo"],
+          ["She keeps","She is keeping","Está manteniendo"],
+          ["We make","We are making","Estamos haciendo"],
+          ["You see","You are seeing","Está viendo"],
+          ["I get","I am getting","Estoy consiguiendo"],
+          ["She comes","She is coming","Está viniendo"],
+        ].map(([s,c,es])=>`<tr><td style="color:var(--muted)">${s}</td><td class="en">${c}</td><td>${es}</td></tr>`).join('')}
+      </table>`,
+
+    compuestas5: `
+      <div class="section-title">Más Palabras Compuestas</div>
+      <ul class="compound-list">
+        ${[
+          ["Birthday","birth + day","Cumpleaños"],
+          ["Workman","work + man","Trabajador/Obrero"],
+          ["Sister-in-law","sister + in + law","Cuñada"],
+          ["Mother-in-law","mother + in + law","Suegra"],
+          ["Father-in-law","father + in + law","Suegro"],
+          ["Brother-in-law","brother + in + law","Cuñado"],
+          ["Son-in-law","son + in + law","Yerno"],
+          ["Daughter-in-law","daughter + in + law","Nuera"],
+          ["On foot","on + foot","A pie"],
+          ["News-boy","news + boy","Repartidor de diarios"],
+        ].map(([word,parts,es])=>`
+        <li>
+          <span class="comp-word">${word}</span>
+          <span>
+            <span class="comp-es">${es}</span>
+            <span class="comp-parts"> (${parts})</span>
+          </span>
+        </li>`).join('')}
+      </ul>`,
+
+    exam5: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Cuál es el pasado de TO BE para I/He/She/It?","WAS"],
+        ["¿Cuál es el pasado de TO BE para You/We/They?","WERE"],
+        ["Traduce: 'She was in the garden'","Ella estaba en el jardín"],
+        ["¿Cómo se forma el presente compuesto?","Con el presente de TO BE + gerundio (-ING)"],
+        ["Traduce: 'They are sending'","Ellos están enviando"],
+        ["¿Qué significa añadir -ER a un sustantivo?","Crea a la persona que realiza esa acción"],
+        ["¿Qué significa 'Painter'?","Pintor (Paint = pintura + er)"],
+        ["Traduce: 'He might be ill'","Él podría estar enfermo"],
+        ["¿Qué significa 'Birthday'?","Cumpleaños"],
+        ["Traduce al inglés: 'Ella está enojada'","She is angry"],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz5: quiz([
+      ["¿Cuál es el pasado de I/He/She/It para TO BE?","Was","Were","Is","Be","Was"],
+      ["'They are sending' significa...","Están enviando","Ellos enviarán","Ellos enviaron","Ellos envían","Están enviando"],
+      ["¿Qué significa 'Farmer'?","Hacendado/Campesino","Marinero","Minero","Fumador","Hacendado/Campesino"],
+      ["'Birthday' significa...","Cumpleaños","Día de trabajo","Día de sol","Fin de semana","Cumpleaños"],
+      ["'I am going' es...","Presente compuesto","Futuro","Pasado","Condicional","Presente compuesto"],
+      ["¿Cuál es el futuro de TO BE?","Will be","Was","Were","Be","Will be"],
+      ["'Sister-in-law' significa...","Cuñada","Hermana","Madre","Suegra","Cuñada"],
+      ["'Sailor' viene de...","Sail (vela)","Sea (mar)","Ship (barco)","Send (enviar)","Sail (vela)"],
+      ["'If I were' significa...","Si yo fuera","Yo seré","Yo era","Yo soy","Si yo fuera"],
+      ["'She is coming' significa...","Ella está viniendo","Ella vino","Ella vendrá","Ella viene","Ella está viniendo"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 6 ───────────────────────
+{
+  num: 6,
+  title: "Sexta Lección",
+  subtitle: "Imperativo · This/That/These/Those · Prefijo UN- · Las Horas",
+  color: "#fb923c",
+  tabs: [
+    { id:"imperativo", label:"Imperativo" },
+    { id:"this", label:"This/That" },
+    { id:"that2", label:"That = QUE" },
+    { id:"un6", label:"Prefijo UN-" },
+    { id:"horas", label:"Las Horas" },
+    { id:"exam6", label:"Examen" },
+    { id:"quiz6", label:"Práctica" },
+  ],
+  panels: {
+    imperativo: `
+      <div class="section-title">Modo Imperativo</div>
+      <div class="info-box">Para dar órdenes: usar el verbo en infinitivo <b>sin TO</b>.</div>
+      ${[
+        ["Be a good boy","Sea un buen niño"],["Come with me","Venga conmigo"],
+        ["Get me that book","Consígame ese libro"],["Do this today","Haga esto hoy"],
+        ["Say something","Diga algo"],["Go to London","Vaya a Londres"],
+        ["Let me go","Déjeme ir"],["Give me my horse","Déme mi caballo"],
+        ["Send a telegram","Envíe un telegrama"],["Do your work","Haga su trabajo"],
+        ["Keep your word","Mantenga su palabra"],["Come tomorrow","Venga mañana"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    this: `
+      <div class="section-title">This / These / That / Those</div>
+      <table class="conj-table">
+        <tr><th>Palabra</th><th>Uso</th><th>Español</th></tr>
+        ${[
+          ["THIS (dis)","Singular cerca","Este/Esta/Esto"],
+          ["THESE (díis)","Plural cerca","Estos/Estas"],
+          ["THAT (dat)","Singular lejos","Ese/Esa/Eso/Aquel/Aquella"],
+          ["THOSE (dóus)","Plural lejos","Esos/Esas/Aquellos/Aquellas"],
+        ].map(([en,uso,es])=>`<tr><td class="en">${en}</td><td style="color:var(--muted);font-size:12px">${uso}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Frases de práctica</div>
+      ${[
+        ["This is our train","Este es nuestro tren"],
+        ["These are good boys","Estos son niños buenos"],
+        ["That is my room","Esa es mi pieza"],
+        ["Those books are mine","Esos libros son míos"],
+        ["This house is very small","Esta casa es muy chica"],
+        ["Those animals are fat","Esos animales están gordos"],
+        ["Give me those scissors","Déme esas tijeras"],
+        ["These are his sons","Estos son sus hijos"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    that2: `
+      <div class="section-title">THAT = QUE (conjunción)</div>
+      <div class="info-box">Además de "ese/aquel", THAT también funciona como la conjunción <b>QUE</b> en oraciones subordinadas.</div>
+      ${[
+        ["He says that he is ill","Él dice que está enfermo"],
+        ["I saw that I was wrong","Vi que yo estaba equivocado"],
+        ["She said that he was here","Ella dijo que él estaba aquí"],
+        ["Say to my son that I am ill","Diga a mi hijo que estoy enfermo"],
+        ["That book that you are reading is mine","Ese libro que usted está leyendo es mío"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    un6: `
+      <div class="section-title">Prefijo UN-</div>
+      <div class="info-box">UN- colocado antes de una palabra le da un significado <b>opuesto</b>. Equivale a DES- o IN- en español.</div>
+      <div class="vocab-grid">
+        ${[
+          ["Equal → Unequal","Igual → Desigual"],
+          ["Happy → Unhappy","Feliz → Infeliz"],
+          ["Kind → Unkind","Bondadoso → Descortés"],
+          ["True → Untrue","Verdadero → Falso"],
+          ["Necessary → Unnecessary","Necesario → Innecesario"],
+          ["Complete → Incomplete","Completo → Incompleto"],
+          ["Fair → Unfair","Justo → Injusto"],
+          ["Lock → Unlock","Cerrar → Abrir"],
+        ].map(([en,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en.split('→')[0].trim()}</div>
+          <div class="vocab-pron">→ <span style="color:var(--accent3)">${en.split('→')[1]?.trim()||''}</span></div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    horas: `
+      <div class="section-title">Hablando de las Horas</div>
+      <div class="info-box">
+        <b>O'clock</b> = en punto<br>
+        <b>Past</b> = y (minutos pasados)<br>
+        <b>To</b> = para (minutos para la siguiente hora)<br>
+        <b>Half</b> = media · <b>Quarter</b> = cuarto
+      </div>
+      <table class="conj-table">
+        <tr><th>Inglés</th><th>Español</th></tr>
+        ${[
+          ["It is seven o'clock","Son las siete"],
+          ["It is five past one","Es la una y cinco"],
+          ["It is twenty past ten","Son las diez y veinte"],
+          ["It is five to nine","Son cinco para las nueve"],
+          ["It is half past nine","Son las nueve y media"],
+          ["It is a quarter past one","Es la una y cuarto"],
+          ["It is a quarter to one","Es un cuarto para la una"],
+          ["It is twenty-five to two","Son veinticinco para las dos"],
+          ["Come at half past eight","Venga a las ocho y media"],
+          ["He will come at four","Él vendrá a las cuatro"],
+        ].map(([en,es])=>`<tr><td class="en">${en}</td><td>${es}</td></tr>`).join('')}
+      </table>`,
+
+    exam6: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Cómo se forma el imperativo en inglés?","Verbo en infinitivo sin TO"],
+        ["¿Cuándo se usa THIS vs THAT?","THIS = cerca. THAT = lejos."],
+        ["¿Qué indica el prefijo UN-?","Da significado opuesto a la palabra"],
+        ["Traduce: 'These houses are clean'","Estas casas son limpias"],
+        ["¿Cuándo significa THAT 'que' (conjunción)?","Cuando une dos oraciones. Ej: He says that he is ill."],
+        ["Traduce: 'It is half past nine'","Son las nueve y media"],
+        ["Traduce: 'It is a quarter to three'","Son un cuarto para las tres"],
+        ["¿Qué significa 'Unkind'?","Descortés / sin bondad"],
+        ["Traduce al imperativo: 'Venga mañana'","Come tomorrow"],
+        ["¿Qué significa THOSE?","Esos/Esas/Aquellos/Aquellas (plural, lejos)"],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz6: quiz([
+      ["'These' en español es...","Estos/Estas","Ese/Esa","Este/Esta","Aquel","Estos/Estas"],
+      ["¿Cómo se forma el imperativo?","Infinitivo sin TO","TO + verbo","Verbo + S","WILL + verbo","Infinitivo sin TO"],
+      ["'It is half past eight' son...","Las ocho y media","Las ocho","Las ocho y cuarto","Las nueve","Las ocho y media"],
+      ["'Unhappy' significa...","Infeliz","Feliz","Muy feliz","Ser feliz","Infeliz"],
+      ["THAT como conjunción significa...","Que","Ese/Esa","Este/Esta","Cuál","Que"],
+      ["'It is a quarter to two' son...","Un cuarto para las dos","Las dos y cuarto","Las dos y media","Las dos","Un cuarto para las dos"],
+      ["'Those' en español es...","Esos/Esas","Este/Esta","Estos/Estas","Ese/Esa","Esos/Esas"],
+      ["'Come with me' es imperativo de...","To come","To go","To get","To give","To come"],
+      ["'Unnecessary' significa...","Innecesario","Necesario","Muy necesario","Poco necesario","Innecesario"],
+      ["'It is five past one' es...","La una y cinco","Las cinco y uno","Las cinco","La una","La una y cinco"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 7 ───────────────────────
+{
+  num: 7,
+  title: "Séptima Lección",
+  subtitle: "Pronombres personales · Posesivos · Reflexivos · SOME/ANY",
+  color: "#22d3ee",
+  tabs: [
+    { id:"pron7", label:"Pronombres" },
+    { id:"posesivos", label:"Posesivos" },
+    { id:"posesion", label:"Posesión 's" },
+    { id:"reflexivos", label:"Reflexivos" },
+    { id:"herethe", label:"HERE/THERE" },
+    { id:"someany", label:"SOME/ANY" },
+    { id:"exam7", label:"Examen" },
+    { id:"quiz7", label:"Práctica" },
+  ],
+  panels: {
+    pron7: `
+      <div class="section-title">Pronombres Personales — Completo</div>
+      <div class="info-box">En inglés los pronombres <b>nunca pueden omitirse</b>, a diferencia del español.</div>
+      <table class="conj-table">
+        <tr><th>Sujeto</th><th>Español</th><th>Objeto</th><th>Español</th></tr>
+        ${[
+          ["I","Yo","Me","Me/Mí"],
+          ["You","Usted","You","Le (a usted)"],
+          ["He","Él","Him","Le/Lo (a él)"],
+          ["She","Ella","Her","La/Le (a ella)"],
+          ["It","Ello","It","Lo/La/Le"],
+          ["We","Nosotros","Us","Nos"],
+          ["They","Ellos","Them","Les (a ellos)"],
+        ].map(([s,es1,o,es2])=>`<tr><td class="en">${s}</td><td>${es1}</td><td class="en">${o}</td><td>${es2}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Preposiciones con pronombres</div>
+      ${[
+        ["For me / For you / For him","Para mí / Para usted / Para él"],
+        ["To me / To us / To them","A mí / A nosotros / A ellos"],
+        ["With me / With her / With them","Conmigo / Con ella / Con ellos"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    posesivos: `
+      <div class="section-title">Pronombres Posesivos</div>
+      <table class="conj-table">
+        <tr><th>Pron.</th><th>Adjetivo posesivo</th><th>Pronombre posesivo</th><th>Español</th></tr>
+        ${[
+          ["I","My","Mine","Mío/a"],
+          ["You","Your","Yours","Suyo/a (usted)"],
+          ["He","His","His","Suyo/a (él)"],
+          ["She","Her","Hers","Suyo/a (ella)"],
+          ["It","Its","—","Su (neutro)"],
+          ["We","Our","Ours","Nuestro/a"],
+          ["They","Their","Theirs","Suyo/a (ellos)"],
+        ].map(([p,adj,pron,es])=>`<tr><td class="en">${p}</td><td class="en">${adj}</td><td class="en">${pron}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Frases de práctica</div>
+      ${[
+        ["This is my book → This book is mine","Este es mi libro → Este libro es mío"],
+        ["This is your pencil → This pencil is yours","Este es su lápiz → Este lápiz es suyo"],
+        ["This is our farm → This farm is ours","Esta es nuestra hacienda → Esta hacienda es nuestra"],
+        ["This is their boat → This boat is theirs","Este es su bote → Este bote es suyo (de ellos)"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    posesion: `
+      <div class="section-title">Indicar Posesión con 's</div>
+      <div class="info-box">
+        Para seres vivientes: <b>nombre + 's + objeto</b><br>
+        Para cosas: <b>of + the</b><br>
+        Ejemplo: "El sombrero de mi padre" = "My father's hat"
+      </div>
+      ${[
+        ["My father's house","La casa de mi padre"],
+        ["My friend's book","El libro de mi amigo"],
+        ["My son's keys","Las llaves de mi hijo"],
+        ["My mother's bed","La cama de mi madre"],
+        ["The leaves of the tree","Las hojas del árbol"],
+        ["The noise of the wind","El ruido del viento"],
+        ["The sound of the rain","El sonido de la lluvia"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    reflexivos: `
+      <div class="section-title">Pronombres Reflexivos</div>
+      <div class="info-box">Se forman añadiendo <b>-self</b> (singular) o <b>-selves</b> (plural) al pronombre posesivo.</div>
+      <table class="conj-table">
+        <tr><th>Pronombre</th><th>Reflexivo</th><th>Español</th></tr>
+        ${[
+          ["I","Myself","Yo mismo"],["You","Yourself","Usted mismo"],
+          ["You (pl.)","Yourselves","Ustedes mismos"],
+          ["He","Himself","Él mismo"],["She","Herself","Ella misma"],
+          ["It","Itself","El/La mismo/a"],["We","Ourselves","Nosotros mismos"],
+          ["They","Themselves","Ellos mismos"],
+        ].map(([p,r,es])=>`<tr><td class="en">${p}</td><td class="en">${r}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      ${[
+        ["Do that yourself","Haga eso usted mismo"],
+        ["He will go himself","Él irá él mismo"],
+        ["She came herself","Ella vino ella misma"],
+        ["By ourselves","Por nosotros mismos"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    herethe: `
+      <div class="section-title">HERE y THERE</div>
+      <div class="info-box">
+        <b>HERE</b> (jíar) = aquí (cerca del hablante)<br>
+        <b>THERE</b> (déar) = allá (lejos del hablante)
+      </div>
+      ${[
+        ["Here is your hat","Aquí está su sombrero"],
+        ["Here is my house","Aquí está mi casa"],
+        ["We will go there today","Nosotros iremos allá hoy"],
+        ["My son is there","Mi hijo está allá"],
+        ["She is there","Ella está allá"],
+        ["They are here","Ellos están aquí"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    someany: `
+      <div class="section-title">SOME y ANY</div>
+      <div class="info-box">
+        <b>SOME</b> = algo de / algún → frases <b>afirmativas</b><br>
+        <b>ANY</b> = algo de / algún → frases <b>negativas e interrogativas</b>
+      </div>
+      ${[
+        ["Give me some white wine","Déme vino blanco"],
+        ["I have not any white wine","No tengo vino blanco"],
+        ["Have you any bread?","¿Tiene usted pan?"],
+        ["Yes, I have some bread","Sí, yo tengo pan"],
+        ["I have some money for you","Tengo dinero para usted"],
+        ["Have you any soap for me?","¿Tiene usted jabón para mí?"],
+        ["Give me some papers, please","Déme papel, por favor"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    exam7: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Pueden omitirse los pronombres en inglés?","NO. En inglés los pronombres nunca pueden omitirse."],
+        ["¿Qué es el pronombre objeto de HE?","HIM"],
+        ["¿Cómo se dice 'el sombrero de mi padre'?","My father's hat"],
+        ["Traduce: 'This book is mine'","Este libro es mío"],
+        ["¿Cuál es el reflexivo de WE?","Ourselves"],
+        ["¿Cuándo se usa SOME vs ANY?","SOME en afirmativas. ANY en negativas e interrogativas."],
+        ["Traduce: 'Do that yourself'","Haga eso usted mismo"],
+        ["¿Qué significa HERE?","Aquí (cerca del hablante)"],
+        ["¿Cómo se indica posesión para seres vivientes?","Nombre + 's + objeto. Ej: My mother's bed."],
+        ["Traduce: 'Give me that pencil'","Déme ese lápiz"],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz7: quiz([
+      ["¿Cuál es el pronombre objeto de SHE?","Her","Him","Them","Her","Her"],
+      ["'Mine' es el pronombre posesivo de...","I (Yo)","He (Él)","We (Nosotros)","They (Ellos)","I (Yo)"],
+      ["¿Cuál es el reflexivo de YOU (singular)?","Yourself","Himself","Myself","Ourselves","Yourself"],
+      ["'My father's hat' significa...","El sombrero de mi padre","Mi sombrero de padre","El padre de mi sombrero","Sombrero para mi padre","El sombrero de mi padre"],
+      ["SOME se usa en frases...","Afirmativas","Negativas","Interrogativas","Siempre","Afirmativas"],
+      ["'Theirs' es posesivo de...","They (Ellos)","He (Él)","She (Ella)","It","They (Ellos)"],
+      ["'Ourselves' significa...","Nosotros mismos","Ellos mismos","Yo mismo","Usted mismo","Nosotros mismos"],
+      ["'There' significa...","Allá","Aquí","Acá","Cerca","Allá"],
+      ["¿Cuál es el pronombre objeto de WE?","Us","Them","Our","We","Us"],
+      ["'Here is my house' significa...","Aquí está mi casa","Esta es mi casa","Mi casa está allá","La casa está aquí","Aquí está mi casa"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 8 ───────────────────────
+{
+  num: 8,
+  title: "Octava Lección",
+  subtitle: "El Tiempo · Comparativos · Contracciones · Negación",
+  color: "#a3e635",
+  tabs: [
+    { id:"tiempo8", label:"El Tiempo" },
+    { id:"comparativos", label:"Comparativos" },
+    { id:"contracciones", label:"Contracciones" },
+    { id:"negacion", label:"Negación" },
+    { id:"exam8", label:"Examen" },
+    { id:"quiz8", label:"Práctica" },
+  ],
+  panels: {
+    tiempo8: `
+      <div class="section-title">Hablando del Tiempo Atmosférico</div>
+      <div class="info-box">Para hablar del clima se usa la forma impersonal con <b>IT</b>.</div>
+      ${[
+        ["It is cold today","Hace frío hoy"],["It is very cold","Hace mucho frío"],
+        ["It is warm today","Hace calor hoy"],["It was cold yesterday","Hizo frío ayer"],
+        ["It is raining","Está lloviendo"],["It was raining","Estaba lloviendo"],
+        ["It is snowing","Está nevando"],["It was snowing","Estaba nevando"],
+        ["The weather is good","El tiempo está bueno"],["The weather is bad","El tiempo está malo"],
+        ["How is the weather today?","¿Cómo está el tiempo hoy?"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    comparativos: `
+      <div class="section-title">Comparativos y Superlativos</div>
+      <div class="info-box">
+        Palabras largas: <b>more</b> (más) + adjetivo / <b>the most</b> (el más)<br>
+        Palabras cortas: agregar <b>-er</b> (más) / <b>-est</b> (el más)
+      </div>
+      <table class="conj-table">
+        <tr><th>Base</th><th>Comparativo</th><th>Superlativo</th></tr>
+        ${[
+          ["Beautiful","More beautiful","The most beautiful"],
+          ["Long","Longer","Longest"],["Young","Younger","Youngest"],
+          ["Old","Older","Oldest"],["Good","Better","Best"],
+          ["Bad","Worse","Worst"],["Little","Less","Least"],
+          ["Far","Farther","Farthest"],
+        ].map(([b,c,s])=>`<tr><td style="color:var(--muted)">${b}</td><td class="en">${c}</td><td class="en">${s}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">THAN y AS...AS</div>
+      <div class="info-box"><b>THAN</b> = que (comparativo). <b>AS...AS</b> = tan...como (igualdad).</div>
+      ${[
+        ["He is younger than you","Él es más joven que usted"],
+        ["She is older than you","Ella es mayor que usted"],
+        ["I am as old as your brother","Yo soy tan viejo como su hermano"],
+        ["It is as cold as yesterday","Hace tanto frío como ayer"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    contracciones: `
+      <div class="section-title">Contracciones con TO BE</div>
+      <table class="conj-table">
+        <tr><th>Completo</th><th>Contracción</th><th>Ejemplo</th></tr>
+        ${[
+          ["I am","I'm","I'm ill"],["You are","You're","You're wrong"],
+          ["He is","He's","He's in Santiago"],["She is","She's","She's very beautiful"],
+          ["We are","We're","We're late"],["They have","They've","They've done their work"],
+        ].map(([c,ct,ex])=>`<tr><td style="color:var(--muted)">${c}</td><td class="en">${ct}</td><td class="en" style="font-size:11px">${ex}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Contracciones con WILL / WILL NOT</div>
+      <table class="conj-table">
+        <tr><th>Completo</th><th>Afirmativo</th><th>Negativo</th></tr>
+        ${[
+          ["I will","I'll","I won't"],["He will","He'll","He won't"],
+          ["She will","She'll","She won't"],["We will","We'll","We won't"],
+          ["They will","They'll","They won't"],
+        ].map(([c,a,n])=>`<tr><td style="color:var(--muted)">${c}</td><td class="en">${a}</td><td class="en">${n}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Contracciones con DO NOT</div>
+      <table class="conj-table">
+        <tr><th>Completo</th><th>Contracción</th></tr>
+        ${[
+          ["I do not","I don't"],["He does not","He doesn't"],
+          ["We do not","We don't"],["I did not","I didn't"],
+        ].map(([c,ct])=>`<tr><td style="color:var(--muted)">${c}</td><td class="en">${ct}</td></tr>`).join('')}
+      </table>`,
+
+    negacion: `
+      <div class="section-title">Negación en Presente (DO NOT)</div>
+      <div class="info-box">Presente: <b>DO NOT</b> (o <b>DOES NOT</b> para He/She/It) + verbo.<br>
+      Pasado: <b>DID NOT</b> + verbo en presente.</div>
+      <table class="conj-table">
+        <tr><th>Afirmativo</th><th>Negativo</th><th>Español</th></tr>
+        ${[
+          ["I keep","I do not keep","Yo no mantengo"],
+          ["She takes","She does not take","Ella no toma"],
+          ["He makes","He does not make","Él no hace"],
+          ["They come","They do not come","Ellos no vienen"],
+          ["We go","We do not go","Nosotros no vamos"],
+        ].map(([a,n,es])=>`<tr><td style="color:var(--muted)">${a}</td><td class="en">${n}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Negación en Pasado (DID NOT)</div>
+      <table class="conj-table">
+        <tr><th>Pasado</th><th>Negativo pasado</th><th>Español</th></tr>
+        ${[
+          ["You saw","You did not see","Usted no vio"],
+          ["They sent","They did not send","No enviaron"],
+          ["He got","He did not get","Él no consiguió"],
+          ["I went","I did not go","Yo no fui"],
+          ["She kept","She did not keep","Ella no mantuvo"],
+        ].map(([a,n,es])=>`<tr><td style="color:var(--muted)">${a}</td><td class="en">${n}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="info-box" style="margin-top:12px">TO BE y TO HAVE forman la negación con <b>NOT</b> después del verbo:<br>"I have <b>no</b> money" / "She is <b>not</b> here"</div>`,
+
+    exam8: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Cómo se forma el comparativo de palabras cortas?","Agregar -ER. Superlativo: -EST"],
+        ["¿Cómo se forma el comparativo de palabras largas?","MORE + adjetivo. Superlativo: THE MOST + adjetivo"],
+        ["¿Cuál es el comparativo irregular de GOOD?","Better (mejor). Superlativo: Best"],
+        ["¿Cuál es el comparativo irregular de BAD?","Worse (peor). Superlativo: Worst"],
+        ["Traduce: 'I don't go'","Yo no voy"],
+        ["¿Cómo se forma la negación en pasado?","DID NOT + verbo en presente. Ej: I did not see."],
+        ["Traduce: 'She didn't send'","Ella no envió"],
+        ["¿Qué significa 'I won't do that'?","Yo no haré eso"],
+        ["Traduce: 'It is as cold as yesterday'","Hace tanto frío como ayer"],
+        ["¿Cómo forman la negación TO BE y TO HAVE?","NOT después del verbo: She is NOT here / I have NO money"],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz8: quiz([
+      ["¿Cuál es el comparativo de GOOD?","Better","Gooder","More good","Goodest","Better"],
+      ["'I won't go' significa...","Yo no iré","Yo iré","Yo fui","Yo voy","Yo no iré"],
+      ["La negación en pasado usa...","DID NOT + verbo presente","DO NOT + verbo","WILL NOT + verbo","NOT + verbo","DID NOT + verbo presente"],
+      ["¿Cuál es el superlativo de BAD?","Worst","Worse","Baddest","Most bad","Worst"],
+      ["'It is raining' significa...","Está lloviendo","Llovió","Lloverá","Llueve siempre","Está lloviendo"],
+      ["'She doesn't take' es negación de...","She takes","She took","She will take","She is taking","She takes"],
+      ["THAN se usa en...","Comparativos","Superlativos","Igualdad","Preguntas","Comparativos"],
+      ["'I'm' es contracción de...","I am","I will","I have","I had","I am"],
+      ["'He is younger than you' significa...","Él es más joven que usted","Él es más viejo","Son iguales","Él es muy joven","Él es más joven que usted"],
+      ["'They didn't come' significa...","Ellos no vinieron","Ellos no vienen","Ellos no vendrán","Ellos nunca vienen","Ellos no vinieron"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 9 ───────────────────────
+{
+  num: 9,
+  title: "Novena Lección",
+  subtitle: "La Interrogación · THERE IS/ARE · YES/IF · Preguntas",
+  color: "#818cf8",
+  tabs: [
+    { id:"interrog9", label:"Interrogación" },
+    { id:"thereis", label:"THERE IS/ARE" },
+    { id:"palabrasint", label:"Who/What/Where" },
+    { id:"yesif", label:"YES / IF" },
+    { id:"exam9", label:"Examen" },
+    { id:"quiz9", label:"Práctica" },
+  ],
+  panels: {
+    interrog9: `
+      <div class="section-title">Interrogación en Presente (DO / DOES)</div>
+      <div class="info-box">Colocar <b>DO</b> antes del pronombre. Con He/She/It: usar <b>DOES</b>.</div>
+      <table class="conj-table">
+        <tr><th>Afirmativo</th><th>Interrogativo</th><th>Español</th></tr>
+        ${[
+          ["They send","Do they send?","¿Envían ellos?"],
+          ["You go","Do you go?","¿Va usted?"],
+          ["She sends","Does she send?","¿Envía ella?"],
+          ["He goes","Does he go?","¿Va él?"],
+          ["We keep","Do we keep?","¿Mantenemos nosotros?"],
+        ].map(([a,i,es])=>`<tr><td style="color:var(--muted)">${a}</td><td class="en">${i}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Interrogación en Pasado (DID)</div>
+      <div class="info-box">Colocar <b>DID</b> antes de la frase (verbo en presente).</div>
+      <table class="conj-table">
+        <tr><th>Pasado</th><th>Interrogativo</th><th>Español</th></tr>
+        ${[
+          ["We did","Did we do?","¿Hicimos nosotros?"],
+          ["You made","Did you make?","¿Hizo usted?"],
+          ["She came","Did she come?","¿Vino ella?"],
+          ["I saw","Did I see?","¿Vi yo?"],
+          ["He sent","Did he send?","¿Envió él?"],
+        ].map(([a,i,es])=>`<tr><td style="color:var(--muted)">${a}</td><td class="en">${i}</td><td>${es}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Interrogación con WILL/WOULD/MAY/MIGHT</div>
+      <div class="info-box">Colocar WILL/WOULD/MAY/MIGHT al inicio de la frase.</div>
+      ${[
+        ["Will you say?","¿Dirá usted?"],["Would he come?","¿Vendría él?"],
+        ["May she send?","¿Puede ella enviar?"],["Might they give?","¿Podrían ellos dar?"],
+        ["Will they come?","¿Vendrán ellos?"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    thereis: `
+      <div class="section-title">THERE IS / THERE ARE = HAY</div>
+      <div class="info-box">
+        <b>THERE IS</b> = hay (singular)<br>
+        <b>THERE ARE</b> = hay (plural)<br>
+        <b>THERE WAS</b> = había/hubo (singular)<br>
+        <b>THERE WERE</b> = había/hubo (plural)<br>
+        <b>THERE WILL BE</b> = habrá
+      </div>
+      ${[
+        ["There is a letter for you","Hay una carta para usted"],
+        ["There are books on the table","Hay libros sobre la mesa"],
+        ["There is no water","No hay agua"],
+        ["There was a war in Asia","Hubo una guerra en Asia"],
+        ["There were no boys here","No había niños aquí"],
+        ["There will be work for you","Habrá trabajo para usted"],
+        ["Is there a boy here?","¿Hay un niño aquí?"],
+        ["Are there any apples?","¿Hay manzanas?"],
+        ["Was there a letter for me?","¿Había una carta para mí?"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    palabrasint: `
+      <div class="section-title">Palabras Interrogativas</div>
+      <div class="vocab-grid">
+        ${[
+          ["WHO (júu)","¿Quién? / ¿Quiénes?"],["WHOM (júum)","¿A quién? (tras preposición)"],
+          ["WHAT (juót)","¿Qué?"],["WHICH (juích)","¿Cuál? / ¿Cuáles?"],
+          ["WHERE (juéar)","¿Dónde?"],["WHEN (juén)","¿Cuándo?"],
+          ["WHY (juái)","¿Por qué?"],["HOW (jáu)","¿Cómo?"],
+          ["WHOSE (júus)","¿De quién?"],
+        ].map(([en,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en.split('(')[0].trim()}</div>
+          <div class="vocab-pron">${en.includes('(')?'('+en.split('(')[1]:''}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>
+      <div class="section-title">Frases interrogativas</div>
+      ${[
+        ["Who said that?","¿Quién dijo eso?"],
+        ["With whom are you working?","¿Con quién está trabajando?"],
+        ["What are you doing?","¿Qué está usted haciendo?"],
+        ["Where is my house?","¿Dónde está mi casa?"],
+        ["When did you go to Peru?","¿Cuándo fue usted a Perú?"],
+        ["How old are you?","¿Qué edad tiene usted?"],
+        ["Why are you not working?","¿Por qué no está trabajando?"],
+        ["Whose is this hat?","¿De quién es este sombrero?"],
+        ["What is the time?","¿Qué hora es?"],
+        ["What a good idea!","¡Qué buena idea!"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    yesif: `
+      <div class="section-title">YES e IF</div>
+      <div class="info-box">
+        <b>YES</b> (iés) = Sí (respuestas afirmativas)<br>
+        <b>IF</b> (if) = Si (condición / "en caso de que")
+      </div>
+      ${[
+        ["Yes, that is the answer","Sí, ésa es la respuesta"],
+        ["If I were you","Si yo fuera usted"],
+        ["Yes, if it is possible","Sí, si es posible"],
+        ["Yes, if my brother goes with me","Sí, si mi hermano va conmigo"],
+        ["If I went to Europe, would you go with me?","Si yo fuera a Europa, ¿iría usted conmigo?"],
+        ["Yes, if I were not ill","Sí, si yo no estuviera enfermo"],
+      ].map(([en,es])=>`<div class="phrase-row"><span class="phrase-en">${en}</span><span class="phrase-es">${es}</span></div>`).join('')}`,
+
+    exam9: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Cómo se forma el interrogativo presente?","DO + pronombre + verbo. Con He/She/It: DOES."],
+        ["¿Cuándo se usa DOES?","Cuando se habla de Él (He) o Ella (She) — tercera persona singular."],
+        ["¿Cómo se forma el interrogativo pasado?","DID + pronombre + verbo en presente."],
+        ["¿Cuándo se usa THERE IS vs THERE ARE?","THERE IS = singular. THERE ARE = plural."],
+        ["Traduce: 'Does she come?'","¿Viene ella?"],
+        ["Traduce: 'Did you get?'","¿Consiguió usted?"],
+        ["¿Qué significa WHO?","¿Quién? / ¿Quiénes? (para personas)"],
+        ["¿Cuándo se usa WHOM?","Después de una preposición. Ej: With whom? (¿Con quién?)"],
+        ["Traduce: 'There was a letter for you'","Había una carta para usted"],
+        ["¿Qué diferencia hay entre YES y IF?","YES = sí (afirmación). IF = si (condición)."],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz9: quiz([
+      ["¿Qué palabra se usa para preguntar con He/She/It en presente?","Does","Do","Did","Will","Does"],
+      ["'Where' significa...","¿Dónde?","¿Cuándo?","¿Quién?","¿Por qué?","¿Dónde?"],
+      ["'There are' es...","Hay (plural)","Hay (singular)","Había","Habrá","Hay (plural)"],
+      ["¿Cómo se interroga en pasado?","DID + verbo presente","DO + verbo","WILL + verbo","DID + verbo pasado","DID + verbo presente"],
+      ["'Whose is this?'","¿De quién es esto?","¿Qué es esto?","¿Cuál es esto?","¿Cómo es esto?","¿De quién es esto?"],
+      ["'There was' es...","Había/Hubo (singular)","Hay (singular)","Habrá","Había (plural)","Había/Hubo (singular)"],
+      ["IF significa...","Si (condición)","Sí (afirmación)","Cuándo","Porque","Si (condición)"],
+      ["'Does he go?' pregunta...","¿Va él?","¿Fue él?","¿Irá él?","¿Iba él?","¿Va él?"],
+      ["'Why' significa...","¿Por qué?","¿Cómo?","¿Cuándo?","¿Dónde?","¿Por qué?"],
+      ["'Will they come?' pregunta...","¿Vendrán ellos?","¿Vienen ellos?","¿Vinieron ellos?","¿Vendría él?","¿Vendrán ellos?"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 10 ───────────────────────
+{
+  num: 10,
+  title: "Décima Lección",
+  subtitle: "Participio Pasado · Combinaciones verbales · Preposiciones",
+  color: "#fb7185",
+  tabs: [
+    { id:"participio", label:"Participio" },
+    { id:"combgive", label:"To Give" },
+    { id:"combmake", label:"To Make" },
+    { id:"combget", label:"To Get/Keep" },
+    { id:"preposiciones", label:"Preposiciones" },
+    { id:"verbprep", label:"Verbo + Prep." },
+    { id:"exam10", label:"Examen" },
+    { id:"quiz10", label:"Práctica" },
+  ],
+  panels: {
+    participio: `
+      <div class="section-title">Los Tres Tiempos de los Verbos Básicos</div>
+      <div class="info-box">Para conjugar cualquier verbo inglés necesitas conocer: <b>Presente · Pasado · Participio pasado</b>.</div>
+      <table class="conj-table">
+        <tr><th>Verbo</th><th>Presente</th><th>Pasado</th><th>Participio</th></tr>
+        ${[
+          ["Dar","Give","Gave","Given"],
+          ["Enviar","Send","Sent","Sent"],
+          ["Tomar","Take","Took","Taken"],
+          ["Hacer","Make","Made","Made"],
+          ["Hacer","Do","Did","Done"],
+          ["Venir","Come","Came","Come"],
+          ["Ir","Go","Went","Gone"],
+          ["Conseguir","Get","Got","Got"],
+          ["Parecer","Seem","Seemed","Seemed"],
+          ["Dejar","Let","Let","Let"],
+          ["Ver","See","Saw","Seen"],
+          ["Decir","Say","Said","Said"],
+          ["Poner","Put","Put","Put"],
+          ["Mantener","Keep","Kept","Kept"],
+          ["Ser/Estar","Be","Was/Were","Been"],
+          ["Tener","Have","Had","Had"],
+        ].map(([es,p,pa,pp])=>`<tr><td style="color:var(--muted)">${es}</td><td class="en">${p}</td><td class="en">${pa}</td><td class="en">${pp}</td></tr>`).join('')}
+      </table>`,
+
+    combgive: `
+      <div class="section-title">Combinaciones con TO GIVE</div>
+      <div class="info-box">En lugar de aprender nuevos verbos, se combina <b>TO GIVE</b> con un sustantivo para crear el mismo significado.</div>
+      ${[
+        ["To give a push","Empujar (dar un empujón)"],
+        ["To give a kiss","Besar (dar un beso)"],
+        ["To give an order","Ordenar (dar una orden)"],
+        ["To give a surprise","Sorprender (dar una sorpresa)"],
+        ["To give a good education","Educar bien (dar buena educación)"],
+      ].map(([en,es])=>`<div class="combo-card"><div class="combo-verb">${en}</div><div class="combo-es">${es}</div></div>`).join('')}
+      <div class="section-title">Combinaciones con TO HAVE</div>
+      ${[
+        ["To have a drink","Beber"],["To have a fight","Pelear"],
+        ["To have a sleep","Dormir"],["To have a meal","Comer"],
+        ["To have a smoke","Fumar"],["To have a talk","Conversar"],
+        ["To have a pain","Doler"],["To have a discussion","Discutir"],
+      ].map(([en,es])=>`<div class="combo-card"><div class="combo-verb">${en}</div><div class="combo-es">${es}</div></div>`).join('')}`,
+
+    combmake: `
+      <div class="section-title">Combinaciones con TO MAKE</div>
+      ${[
+        ["To make a journey","Viajar"],["To make a change","Cambiar"],
+        ["To make a decision","Decidir"],["To make a discovery","Descubrir"],
+        ["To make a start","Principiar"],["To make an agreement","Acordar"],
+        ["To make an attack","Atacar"],["To make an error","Equivocarse"],
+        ["To make an offer","Ofrecer"],["To make a suggestion","Sugerir"],
+        ["To make a protest","Protestar"],["To make a mark","Marcar"],
+      ].map(([en,es])=>`<div class="combo-card"><div class="combo-verb">${en}</div><div class="combo-es">${es}</div></div>`).join('')}`,
+
+    combget: `
+      <div class="section-title">Combinaciones con TO GET</div>
+      ${[
+        ["To get violent","Violentarse"],["To get strong","Fortalecerse"],
+        ["To get tired","Cansarse"],["To get well","Mejorar"],
+        ["To get thin","Adelgazar"],["To get ill","Enfermarse"],
+        ["To get dry","Secarse"],["To get wet","Mojarse"],
+      ].map(([en,es])=>`<div class="combo-card"><div class="combo-verb">${en}</div><div class="combo-es">${es}</div></div>`).join('')}
+      <div class="section-title">Combinaciones con TO KEEP</div>
+      ${[
+        ["To keep awake","Mantenerse despierto"],
+        ["To keep quiet","Mantenerse tranquilo"],
+        ["To keep secret","Mantener en secreto"],
+      ].map(([en,es])=>`<div class="combo-card"><div class="combo-verb">${en}</div><div class="combo-es">${es}</div></div>`).join('')}`,
+
+    preposiciones: `
+      <div class="section-title">Las Preposiciones</div>
+      <div class="vocab-grid">
+        ${[
+          ["About (ábaut)","Acerca de / Alrededor de"],["After (áafter)","Después de / Detrás de"],
+          ["Among (amáng)","Entre (más de dos)"],["At (at)","A / En"],
+          ["Before (bifóor)","Antes de / Delante de"],["Between (bituíin)","Entre (solo dos)"],
+          ["By (bai)","Por / Cerca de"],["Down (daun)","Bajo / Abajo"],
+          ["For (foor)","Para"],["From (from)","Desde / De"],
+          ["In (in)","En / Dentro de"],["Of (ov)","De"],
+          ["Off (oof)","Fuera"],["On (on)","En / Sobre"],
+          ["Out (aut)","Afuera / Fuera"],["Over (óuver)","Sobre / Por encima de"],
+          ["Through (zrúu)","A través de"],["To (tu)","A"],
+          ["Under (ánder)","Debajo de"],["Up (ap)","Arriba"],
+          ["With (uíz)","Con"],
+        ].map(([en,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en.split('(')[0].trim()}</div>
+          <div class="vocab-pron">${en.includes('(')?'('+en.split('(')[1]:''}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    verbprep: `
+      <div class="section-title">Verbos Combinados con Preposiciones</div>
+      ${[
+        ["To go after","Perseguir","The dog is going after the cat."],
+        ["To go up","Subir","We went up the mountain."],
+        ["To go out","Salir","He went out of the house."],
+        ["To come in","Entrar","You may come in, now."],
+        ["To come with","Acompañar","Come with me to the school."],
+        ["To come for","Venir a buscar","I have come for my money."],
+        ["To get up","Levantarse","I get up early."],
+        ["To get out","Salir","Get out of my house."],
+        ["To let out","Dejar salir","He let out the dog."],
+        ["To take off","Quitarse","I took off my hat."],
+        ["To put on","Ponerse","He put on his coat."],
+        ["To send for","Enviar a buscar","I will send for my sister."],
+        ["To put in","Insertar/Poner dentro","That news will be put in the papers."],
+      ].map(([v,es,ex])=>`
+      <div class="combo-card">
+        <div class="combo-verb">${v}</div>
+        <div class="combo-es">${es}</div>
+        <div class="combo-ex">${ex}</div>
+      </div>`).join('')}`,
+
+    exam10: `
+      <button class="btn-reveal-all" onclick="revealAll(this)">Mostrar todas las respuestas</button>
+      ${[
+        ["¿Cuál es el participio pasado de TO GO?","Gone"],
+        ["¿Cuál es el participio pasado de TO SEE?","Seen"],
+        ["¿Cuál es el participio pasado de TO BE?","Been"],
+        ["¿Qué significa 'To get tired'?","Cansarse"],
+        ["¿Qué significa 'To make a journey'?","Viajar"],
+        ["Traduce: 'I have taken a bath'","Yo he tomado un baño"],
+        ["¿Qué significa la preposición BETWEEN?","Entre (solo dos personas o cosas)"],
+        ["¿Qué significa 'To go after'?","Perseguir"],
+        ["¿Qué significa 'To put on'?","Ponerse (ropa/sombrero)"],
+        ["¿Qué significa 'To get up'?","Levantarse"],
+      ].map(([q,a])=>examItem(q,a)).join('')}`,
+
+    quiz10: quiz([
+      ["¿Cuál es el participio de TO GIVE?","Given","Gave","Give","Gived","Given"],
+      ["'To have a sleep' significa...","Dormir","Beber","Comer","Fumar","Dormir"],
+      ["¿Cuál es el participio de TO GO?","Gone","Went","Go","Goed","Gone"],
+      ["'To get wet' significa...","Mojarse","Secarse","Cansarse","Adelgazar","Mojarse"],
+      ["'To go out' significa...","Salir","Entrar","Subir","Perseguir","Salir"],
+      ["'Between' significa...","Entre (solo dos)","Entre (muchos)","Antes de","Después de","Entre (solo dos)"],
+      ["'To make a decision' significa...","Decidir","Sugerir","Ofrecer","Protestar","Decidir"],
+      ["¿Cuál es el participio de TO SEE?","Seen","Saw","See","Seed","Seen"],
+      ["'To put on' significa...","Ponerse","Quitarse","Salir","Entrar","Ponerse"],
+      ["'To keep quiet' significa...","Mantenerse tranquilo","Mantenerse despierto","Adelgazar","Fortalecerse","Mantenerse tranquilo"],
+    ])
+  }
+},
+
+// ─────────────────────── LECCIÓN 11 ───────────────────────
+{
+  num: 11,
+  title: "Undécima Lección",
+  subtitle: "Vocabulario completo · Pronunciación · El Alfabeto",
+  color: "#67e8f9",
+  tabs: [
+    { id:"alfabeto", label:"Alfabeto" },
+    { id:"vocab11a", label:"Vocab A–F" },
+    { id:"vocab11b", label:"Vocab G–M" },
+    { id:"vocab11c", label:"Vocab N–Z" },
+    { id:"repaso", label:"Repaso General" },
+    { id:"quiz11", label:"Práctica Final" },
+  ],
+  panels: {
+    alfabeto: `
+      <div class="section-title">El Alfabeto Inglés</div>
+      <div class="info-box">Aprende primero las letras más difíciles (las que suenan muy diferente al español).</div>
+      <div class="vocab-grid">
+        ${[
+          ["A","(éi)"],["B","(bíi)"],["C","(síi)"],["D","(díi)"],
+          ["E","(íi)"],["F","(éf)"],["G","(yíi)"],["H","(éitch)"],
+          ["I","(ái)"],["J","(yéi)"],["K","(kéi)"],["L","(el)"],
+          ["M","(em)"],["N","(en)"],["O","(ou)"],["P","(píi)"],
+          ["Q","(kiúu)"],["R","(aar)"],["S","(es)"],["T","(tíi)"],
+          ["U","(iúu)"],["V","(víi)"],["W","(dábliúu)"],["X","(éks)"],
+          ["Y","(uái)"],["Z","(zed)"],
+        ].map(([l,p])=>`
+        <div class="vocab-item">
+          <div class="vocab-en" style="font-size:1.4rem">${l}</div>
+          <div class="vocab-pron">${p}</div>
+        </div>`).join('')}
+      </div>`,
+
+    vocab11a: `
+      <div class="section-title">Vocabulario A–F</div>
+      <div class="vocab-grid">
+        ${[
+          ["Able","(éibel)","Hábil, capaz"],["About","(abáut)","Acerca de"],
+          ["Account","(acáunt)","Cuenta, informe"],["Air","(éar)","Aire"],
+          ["All","(ól)","Todo/Todos"],["Almost","(ólmoust)","Casi"],
+          ["Amount","(amáunt)","Cantidad"],["Angry","(ángri)","Enojado"],
+          ["Animal","(ánimal)","Animal"],["Answer","(áanser)","Respuesta"],
+          ["Any","(éni)","Alguno/Cualquiera"],["Apple","(ápel)","Manzana"],
+          ["Arm","(aarm)","Brazo / Arma"],["Army","(áarmi)","Ejército"],
+          ["Art","(aart)","Arte"],["Bag","(bag)","Saco, bolsa"],
+          ["Ball","(bol)","Pelota"],["Bath","(baaz)","Baño"],
+          ["Beautiful","(biútiful)","Hermoso"],["Bed","(bed)","Cama"],
+          ["Bird","(béerd)","Pájaro"],["Blood","(blad)","Sangre"],
+          ["Body","(bódi)","Cuerpo"],["Book","(buk)","Libro"],
+          ["Box","(boks)","Caja / Boxeo"],["Boy","(boi)","Niño"],
+          ["Bread","(bred)","Pan"],["Brother","(bráder)","Hermano"],
+          ["Building","(bílding)","Edificio"],["Business","(bisnés)","Negocio"],
+          ["Cake","(quéik)","Torta"],["Care","(quéar)","Cuidado"],
+          ["Cat","(cat)","Gato"],["Change","(chéiny)","Cambio"],
+          ["Cheap","(chíip)","Barato"],["Clean","(clíin)","Limpio"],
+          ["Cloud","(claud)","Nube"],["Country","(cántri)","País / Campo"],
+          ["Cup","(cap)","Taza"],["Danger","(déinyer)","Peligro"],
+          ["Dark","(daark)","Oscuro"],["Daughter","(dóoter)","Hija"],
+          ["Day","(déi)","Día"],["Death","(dez)","Muerte"],
+          ["Dog","(dog)","Perro"],["Door","(door)","Puerta"],
+          ["Doubt","(daut)","Duda"],["Dress","(dres)","Vestido"],
+          ["Ear","(íar)","Oreja"],["Earth","(éerz)","Tierra"],
+          ["Effect","(iféct)","Efecto"],["End","(end)","Fin"],
+          ["Eye","(ái)","Ojo"],["Face","(féis)","Cara"],
+          ["Family","(fámili)","Familia"],["Farm","(faarm)","Hacienda"],
+          ["Fear","(fíar)","Miedo"],["Finger","(fínguer)","Dedo"],
+          ["Fish","(fiSH)","Pescado"],["Flag","(flag)","Bandera"],
+          ["Flower","(fláuer)","Flor"],["Food","(fuud)","Alimento"],
+          ["Friend","(frend)","Amigo"],["Fruit","(fruut)","Fruta"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    vocab11b: `
+      <div class="section-title">Vocabulario G–M</div>
+      <div class="vocab-grid">
+        ${[
+          ["Garden","(gáarden)","Jardín"],["Girl","(guéerl)","Niña"],
+          ["Glass","(glaas)","Vaso / Vidrio"],["Gold","(góuld)","Oro"],
+          ["Good","(gud)","Bueno"],["Government","(gávnment)","Gobierno"],
+          ["Grass","(graas)","Pasto"],["Green","(gríin)","Verde"],
+          ["Hair","(jéar)","Pelo"],["Hand","(jand)","Mano"],
+          ["Happy","(jápi)","Feliz"],["Hard","(jaaard)","Duro"],
+          ["Hat","(jat)","Sombrero"],["Heart","(jaart)","Corazón"],
+          ["Help","(jelp)","Ayuda"],["Here","(jíar)","Aquí"],
+          ["History","(jístori)","Historia"],["Hole","(joul)","Hoyo"],
+          ["Horse","(joors)","Caballo"],["House","(jaus)","Casa"],
+          ["Ice","(ais)","Hielo"],["Idea","(aidía)","Idea"],
+          ["Ill","(il)","Enfermo"],["Industry","(índastri)","Industria"],
+          ["Ink","(ink)","Tinta"],["Iron","(áiern)","Hierro"],
+          ["Island","(áiland)","Isla"],["Jewel","(yúuel)","Joya"],
+          ["Journey","(yérni)","Viaje"],["Jump","(yamp)","Salto"],
+          ["Keep","(kíip)","Mantener"],["Key","(kíi)","Llave"],
+          ["Kind","(káind)","Bondadoso"],["Kiss","(kis)","Beso"],
+          ["Knee","(níi)","Rodilla"],["Knife","(náif)","Cuchillo"],
+          ["Land","(land)","Tierra / País"],["Language","(lánguiy)","Idioma"],
+          ["Leaf","(líif)","Hoja"],["Left","(left)","Izquierda"],
+          ["Letter","(léter)","Carta / Letra"],["Lift","(lift)","Ascensor"],
+          ["Light","(lait)","Luz / Liviano"],["Lip","(lip)","Labio"],
+          ["Machine","(maSHíin)","Máquina"],["Male","(méil)","Masculino"],
+          ["Map","(map)","Mapa"],["Memory","(mémori)","Memoria"],
+          ["Money","(mani)","Dinero"],["Moon","(múun)","Luna"],
+          ["Mountain","(máunten)","Montaña"],["Mouth","(máuz)","Boca"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    vocab11c: `
+      <div class="section-title">Vocabulario N–Z</div>
+      <div class="vocab-grid">
+        ${[
+          ["Nail","(néil)","Uña / Clavo"],["Nation","(néiSHon)","Nación"],
+          ["Needle","(níidel)","Aguja"],["Noise","(nóis)","Ruido"],
+          ["North","(noorz)","Norte"],["Nose","(nouz)","Nariz"],
+          ["Note","(nout)","Nota"],["Oil","(óil)","Aceite"],
+          ["Old","(óuld)","Viejo"],["Open","(óupen)","Abierto"],
+          ["Order","(óorder)","Orden"],["Pain","(péin)","Dolor"],
+          ["Paper","(péiper)","Papel"],["Peace","(píis)","Paz"],
+          ["Pen","(pen)","Pluma"],["Pencil","(pénsil)","Lápiz"],
+          ["Person","(péerzon)","Persona"],["Plant","(plant)","Planta"],
+          ["Plate","(pléit)","Plato"],["Please","(plíis)","Por favor"],
+          ["Prison","(prízon)","Prisión"],["Profit","(prófit)","Ganancia"],
+          ["Question","(cuést-SHon)","Pregunta"],["Rain","(réin)","Lluvia"],
+          ["Ready","(rédi)","Listo"],["Reason","(ríizon)","Razón"],
+          ["Right","(ráit)","Derecho / Correcto"],["River","(ríver)","Río"],
+          ["Road","(róud)","Camino"],["Room","(rúum)","Pieza / Cuarto"],
+          ["Round","(ráund)","Redondo"],["Sea","(síi)","Mar"],
+          ["Secret","(síicret)","Secreto"],["Ship","(SHíip)","Barco"],
+          ["Silk","(silk)","Seda"],["Skin","(skin)","Piel"],
+          ["Sky","(skái)","Cielo"],["Sleep","(slíip)","Sueño"],
+          ["Smell","(smel)","Olor"],["Smile","(smáil)","Sonrisa"],
+          ["Snow","(snóu)","Nieve"],["Son","(san)","Hijo"],
+          ["Sound","(sáund)","Sonido"],["South","(sauz)","Sur"],
+          ["Star","(staar)","Estrella"],["Stone","(stoun)","Piedra"],
+          ["Story","(stóri)","Historia / Cuento"],["Sugar","(SHúgar)","Azúcar"],
+          ["Sun","(san)","Sol"],["Table","(téibel)","Mesa"],
+          ["Tall","(tól)","Alto"],["Tax","(taks)","Impuesto"],
+          ["Thread","(zréed)","Hilo"],["Time","(táim)","Tiempo / Hora"],
+          ["Town","(táun)","Ciudad"],["Trade","(tréid)","Comercio"],
+          ["Tree","(tríi)","Árbol"],["True","(trúu)","Verdadero"],
+          ["War","(uór)","Guerra"],["Watch","(uótch)","Reloj (bolsillo)"],
+          ["Water","(uóter)","Agua"],["Way","(uéi)","Camino / Manera"],
+          ["Week","(uíik)","Semana"],["West","(uést)","Oeste"],
+          ["Wind","(uínd)","Viento"],["Window","(uíndou)","Ventana"],
+          ["Wood","(uud)","Madera / Bosque"],["Word","(uéerd)","Palabra"],
+          ["Work","(uéerk)","Trabajo"],["Year","(yíar)","Año"],
+        ].map(([en,pron,es])=>`
+        <div class="vocab-item">
+          <div class="vocab-en">${en}</div>
+          <div class="vocab-pron">${pron}</div>
+          <div class="vocab-es">${es}</div>
+        </div>`).join('')}
+      </div>`,
+
+    repaso: `
+      <div class="section-title">Resumen del Sistema Inglés Básico</div>
+      <div class="info-box"><b>16 Verbos Básicos</b> reemplazan 4,000 verbos del inglés común. Con ellos + las combinaciones verbales puedes expresar cualquier idea.</div>
+      <div class="section-title">Los 7 Tiempos Verbales</div>
+      <table class="conj-table">
+        <tr><th>Tiempo</th><th>Cómo se forma</th><th>Ejemplo</th></tr>
+        ${[
+          ["Presente","Verbo solo","I go"],
+          ["Presente compuesto","TO BE + -ING","I am going"],
+          ["Pasado","Forma irregular","I went"],
+          ["Futuro","WILL + verbo","I will go"],
+          ["Condicional","WOULD + verbo","I would go"],
+          ["Posibilidad (MAY)","MAY + verbo","I may go"],
+          ["Posibilidad futura (MIGHT)","MIGHT + verbo","I might go"],
+        ].map(([t,f,ex])=>`<tr><td style="color:var(--accent)">${t}</td><td style="color:var(--muted)">${f}</td><td class="en">${ex}</td></tr>`).join('')}
+      </table>
+      <div class="section-title">Los Opuestos más importantes</div>
+      <div class="opposite-grid">
+        ${[
+          ["Good","Bad","Bueno","Malo"],["Big","Small","Grande","Pequeño"],
+          ["Hot","Cold","Caliente","Frío"],["Fast","Slow","Rápido","Lento"],
+          ["Old","Young","Viejo","Joven"],["Clean","Dirty","Limpio","Sucio"],
+          ["War","Peace","Guerra","Paz"],["Here","There","Aquí","Allá"],
+          ["Up","Down","Arriba","Abajo"],["Before","After","Antes","Después"],
+          ["First","Last","Primero","Último"],["Go","Come","Ir","Venir"],
+        ].map(([e1,e2,s1,s2])=>`
+        <div class="opp-card">
+          <div class="word">${e1}</div><div class="trans">${s1}</div>
+          <div class="opp-divider">↕</div>
+          <div class="word">${e2}</div><div class="trans">${s2}</div>
+        </div>`).join('')}
+      </div>`,
+
+    quiz11: quiz([
+      ["¿Cómo se llama la letra W en inglés?","Double-u","Double-v","Doble-u","Dab-liu","Double-u"],
+      ["'Moon' significa...","Luna","Sol","Estrella","Planeta","Luna"],
+      ["'Knee' significa...","Rodilla","Codo","Pie","Mano","Rodilla"],
+      ["¿Cuántos tiempos verbales tiene el sistema básico?","7","5","10","16","7"],
+      ["'Thread' significa...","Hilo","Aguja","Tela","Algodón","Hilo"],
+      ["'Island' significa...","Isla","Montaña","Río","Mar","Isla"],
+      ["'Profit' significa...","Ganancia","Pérdida","Deuda","Crédito","Ganancia"],
+      ["¿Cómo se pronuncia la letra I en inglés?","(ái)","(íi)","(i)","(ai)","(ái)"],
+      ["'Doubt' significa...","Duda","Verdad","Razón","Pregunta","Duda"],
+      ["'Smell' significa...","Olor","Sonido","Tacto","Vista","Olor"],
+    ])
+  }
+},
+
+]; // end LESSONS array
+
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+
+function examItem(q,a) {
+  return `<div class="exam-item">
+    <div class="exam-q">${q}</div>
+    <button class="btn-reveal" onclick="revealOne(this)">Ver respuesta</button>
+    <div class="exam-a">${a}</div>
+  </div>`;
+}
+
+function quiz(questions) {
+  const id = Math.random().toString(36).slice(2,8);
+  return `<div class="quiz-wrap" id="quiz-${id}" data-qs='${JSON.stringify(questions).replace(/'/g,"&#39;")}' data-idx="0" data-score="0"></div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let currentLesson = null;
+let completed = JSON.parse(localStorage.getItem('ib_done')||'[]');
+
+function saveCompleted() {
+  try { localStorage.setItem('ib_done', JSON.stringify(completed)); } catch(e){}
+}
+
+// ════════════════════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════════════════════
+
+function renderHome() {
+  const grid = document.getElementById('lessons-grid');
+  grid.innerHTML = LESSONS.map(l => {
+    const done = completed.includes(l.num);
+    const tagColors = ['tag-blue','tag-gold','tag-green','tag-red'];
+    const topicWords = l.subtitle.split('·').slice(0,3).map((t,i)=>
+      `<span class="tag ${tagColors[i%4]}">${t.trim()}</span>`).join('');
+    return `
+    <div class="lesson-card" onclick="openLesson(${l.num})">
+      <div class="lesson-num ${done?'done':''}" style="${done?'':'border-color:'+l.color+'33;color:'+l.color}">
+        ${done ? '✓' : l.num}
+      </div>
+      <div class="lesson-info">
+        <h3>${l.title}</h3>
+        <div class="lesson-tags">${topicWords}</div>
+      </div>
+      <span class="lesson-arrow">›</span>
+    </div>`;
+  }).join('');
+  document.getElementById('global-progress').style.width = (completed.length/LESSONS.length*100)+'%';
+}
+
+// ════════════════════════════════════════════════════════
+// LESSON VIEW
+// ════════════════════════════════════════════════════════
+
+function openLesson(num) {
+  const l = LESSONS.find(x => x.num === num);
+  currentLesson = l;
+  document.getElementById('home').style.display = 'none';
+  const lv = document.getElementById('lesson-view');
+  lv.style.display = 'flex';
+
+  document.getElementById('lesson-title').textContent = l.title;
+
+  // Tabs
+  const tabsEl = document.getElementById('tabs-container');
+  tabsEl.innerHTML = l.tabs.map((t,i) =>
+    `<div class="tab ${i===0?'active':''}" onclick="switchTab('${t.id}',this)">${t.label}</div>`
+  ).join('');
+
+  // Content
+  const content = document.getElementById('lesson-content');
+  content.innerHTML = l.tabs.map((t,i) =>
+    `<div class="panel ${i===0?'active':''}" id="panel-${t.id}">${l.panels[t.id]||''}</div>`
+  ).join('');
+
+  // Init quizzes
+  content.querySelectorAll('.quiz-wrap').forEach(el => renderQuiz(el));
+
+  // Mark done
+  if (!completed.includes(num)) {
+    completed.push(num);
+    saveCompleted();
+  }
+  window.scrollTo(0,0);
+}
+
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+id)?.classList.add('active');
+}
+
+function goHome() {
+  document.getElementById('lesson-view').style.display = 'none';
+  document.getElementById('home').style.display = 'flex';
+  renderHome();
+  window.scrollTo(0,0);
+}
+
+// ════════════════════════════════════════════════════════
+// EXAM
+// ════════════════════════════════════════════════════════
+
+function revealOne(btn) {
+  const item = btn.closest('.exam-item');
+  const ans = item.querySelector('.exam-a');
+  ans.style.display = 'block';
+  btn.style.display = 'none';
+}
+
+function revealAll(btn) {
+  const container = btn.closest('.panel');
+  container.querySelectorAll('.exam-a').forEach(a => a.style.display='block');
+  container.querySelectorAll('.btn-reveal').forEach(b => b.style.display='none');
+  btn.textContent = 'Todas las respuestas mostradas ✓';
+  btn.style.color = 'var(--accent2)';
+  btn.style.borderColor = 'var(--accent2)';
+}
+
+// ════════════════════════════════════════════════════════
+// QUIZ ENGINE
+// ════════════════════════════════════════════════════════
+
+function renderQuiz(el) {
+  const qs = JSON.parse(el.dataset.qs.replace(/&#39;/g,"'"));
+  const idx = parseInt(el.dataset.idx);
+  const score = parseInt(el.dataset.score);
+
+  if (idx >= qs.length) {
+    el.innerHTML = `
+      <div class="quiz-result">
+        <div class="quiz-score">${score}/${qs.length}</div>
+        <p>${score===qs.length ? '¡Perfecto! Lección dominada.' : score >= qs.length*0.7 ? '¡Muy bien! Sigue practicando.' : 'Repasa el contenido e intenta de nuevo.'}</p>
+        <button class="btn-restart" onclick="restartQuiz(this)">Reiniciar Quiz</button>
+      </div>`;
+    return;
+  }
+
+  const q = qs[idx];
+  // q format: [question, opt1, opt2, opt3, opt4, correct]
+  const question = q[0];
+  const options = q.slice(1, q.length-1);
+  const correct = q[q.length-1];
+  const shuffled = options.sort(()=>Math.random()-.5);
+
+  el.innerHTML = `
+    <div class="quiz-progress">
+      <div class="quiz-bar"><div class="quiz-fill" style="width:${idx/qs.length*100}%"></div></div>
+      <span class="quiz-counter">${idx+1}/${qs.length}</span>
+    </div>
+    <div class="quiz-card">
+      <div class="quiz-q">${question}</div>
+      <div class="quiz-options">
+        ${shuffled.map(o=>`<button class="quiz-opt" onclick="answerQuiz(this,'${o.replace(/'/g,"&#39;")}','${correct.replace(/'/g,"&#39;")}',this.closest('.quiz-wrap'))">${o}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function answerQuiz(btn, chosen, correct, wrap) {
+  const opts = wrap.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.onclick=null);
+
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  if (!isCorrect) {
+    opts.forEach(o => { if (o.textContent===correct) o.classList.add('correct'); });
+  }
+
+  wrap.dataset.score = String(parseInt(wrap.dataset.score) + (isCorrect?1:0));
+  wrap.dataset.idx = String(parseInt(wrap.dataset.idx)+1);
+
+  setTimeout(() => renderQuiz(wrap), 900);
+}
+
+function restartQuiz(btn) {
+  const wrap = btn.closest('.quiz-wrap');
+  wrap.dataset.idx = '0';
+  wrap.dataset.score = '0';
+  renderQuiz(wrap);
+}
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+renderHome();
+</script>
+</body>
+</html>
